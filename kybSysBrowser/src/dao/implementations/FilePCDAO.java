@@ -15,7 +15,7 @@ public class FilePCDAO implements PCDAO {
 	private WindowBrowser browser = WindowBrowserFactory.INSTANCE
 			.getWindow_Browser();
 	private final File fileOfBookmarks = browser.getFileOfBookmarks();
-	TreeItem selectedTreeItem = browser.getCurrentSelection();
+	//TreeItem selectedTreeItem = browser.getCurrentSelection();
 
 	@Override
 	public void insertPC(PC pc) {
@@ -36,11 +36,11 @@ public class FilePCDAO implements PCDAO {
 				scLine = new Scanner(line);
 				scLine.useDelimiter("\t");
 				String pcName = scLine.next();
-				if (!pcName.equals(selectedTreeItem.getText())) {
+			/*	if (!pcName.equals(selectedTreeItem.getText())) {
 					fw.write(line + "\n");
 				} else {
 					continue;
-				}
+				}*/
 			}
 			if (fw != null)
 				fw.close();
