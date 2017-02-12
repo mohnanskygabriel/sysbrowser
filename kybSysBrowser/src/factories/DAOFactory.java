@@ -11,15 +11,14 @@ public enum DAOFactory {
 	BookmarkDAO bookmarkDao;
 
 	public PCDAO getPCDAO() {
-		if (pcDao != null)
-			return pcDao;
-		return pcDao = new FilePCDAO();
+		if (pcDao == null)
+			pcDao = new FilePCDAO();
+		return pcDao;
 	}
 
 	public BookmarkDAO getBookmarkDao() {
-		if (bookmarkDao != null)
-			return bookmarkDao;
-		return bookmarkDao = new FileBookmarkDAO();
+		if (bookmarkDao == null)
+			bookmarkDao = new FileBookmarkDAO();
+		return bookmarkDao;
 	}
-
 }

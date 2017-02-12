@@ -16,7 +16,7 @@ public interface BookmarkDAO {
 	public void editBookmark(Bookmark oldBookmark, Bookmark newBookmark)
 			throws FileNotFoundException, IOException;
 
-	public Bookmark getBookmarkByName(String name)
+	public Bookmark getBookmark(Bookmark bookmark)
 			throws FileNotFoundException, IOException;
 
 	public List<Bookmark> getBookmarkAll();

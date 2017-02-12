@@ -24,15 +24,13 @@ import entities.Bookmark;
 import factories.WindowBrowserFactory;
 
 public class FileBookmarkDAO implements BookmarkDAO {
-	private WindowBrowser browser = WindowBrowserFactory.INSTANCE
-			.getWindow_Browser();
+	private WindowBrowser browser = WindowBrowserFactory.INSTANCE.getWindow_Browser();
 	private final File fileOfBookmarks = browser.getFileOfBookmarks();
 
 	/* TreeItem selectedTreeItem = browser.getCurrentSelection(); */
 
 	@Override
-	public void insertBookmark(Bookmark bookmark) throws FileNotFoundException,
-			IOException {
+	public void insertBookmark(Bookmark bookmark) throws FileNotFoundException, IOException {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		FileWriter fileW = new FileWriter(fileOfBookmarks, true);
 		JsonWriter writer = gson.newJsonWriter(fileW);
@@ -85,8 +83,7 @@ public class FileBookmarkDAO implements BookmarkDAO {
 	}
 
 	@Override
-	public void editBookmark(Bookmark oldBookmark, Bookmark newBookmark)
-			throws IOException {
+	public void editBookmark(Bookmark oldBookmark, Bookmark newBookmark) throws IOException {
 		FileWriter fw = null;
 		File copyOfBookmarks = new File("copyOfBookmarks.txt");
 		Scanner lineScanner = null;
@@ -140,8 +137,7 @@ public class FileBookmarkDAO implements BookmarkDAO {
 	}
 
 	@Override
-	public Bookmark getBookmarkByName(String name)
-			throws FileNotFoundException, IOException {
+	public Bookmark getBookmark(Bookmark bookmark) throws FileNotFoundException, IOException {
 		FileReader reader = new FileReader(fileOfBookmarks);
 		Gson gson = new GsonBuilder().create();
 		JsonReader jReader = new JsonReader(reader);
@@ -150,9 +146,9 @@ public class FileBookmarkDAO implements BookmarkDAO {
 			// if the Reader is in the end of file it doesn't found the bookmark
 			if (jReader.peek() == JsonToken.END_DOCUMENT)
 				return null;
-			Bookmark bookmark = gson.fromJson(jReader, Bookmark.class);
-			if (bookmark.getName().equals(name))
-				return bookmark;
+			Bookmark bookmarkFromReader = gson.fromJson(jReader, Bookmark.class);
+			if (bookmarkFromReader == bookmark)
+				return bookmarkFromReader;
 		}
 		return null;
 

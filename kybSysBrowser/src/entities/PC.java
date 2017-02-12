@@ -1,12 +1,14 @@
 package entities;
 
-public class PC {
+import java.util.Enumeration;
+import javax.swing.tree.TreeNode;
+
+public class PC implements TreeNode {
 	String name = null;
 	public String connectionType = null;
 	public String ip = null;
 
-	public PC(String name, String ip, String connectionType, String userName,
-			String password) {
+	public PC(String name, String ip, String connectionType, String userName, String password) {
 		this.name = name;
 		this.ip = ip;
 		this.connectionType = connectionType;
@@ -37,5 +39,41 @@ public class PC {
 
 	public void setIp(String ip) {
 		this.ip = ip;
+	}
+
+	@Override
+	public Enumeration<Object> children() {
+		return null;
+	}
+
+	@Override
+	public boolean getAllowsChildren() {
+		return false;
+	}
+
+	@Override
+	public TreeNode getChildAt(int childIndex) {
+		return null;
+	}
+
+	@Override
+	public int getChildCount() {
+		return 0;
+	}
+
+	@Override
+	public int getIndex(TreeNode node) {
+		return -1;
+	}
+
+	@Override
+	public TreeNode getParent() {
+		//TODO
+		return null;
+	}
+
+	@Override
+	public boolean isLeaf() {
+		return true;
 	}
 }

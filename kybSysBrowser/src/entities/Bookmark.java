@@ -1,9 +1,14 @@
 package entities;
 
+import java.util.Enumeration;
 import java.util.LinkedList;
+import java.util.Vector;
 
-public class Bookmark {
+import javax.swing.tree.TreeNode;
 
+import factories.ModelFactory;
+
+public class Bookmark implements TreeNode {
 	private String name = null;
 	private String url = null;
 	private LinkedList<PC> computerList = null;
@@ -44,6 +49,46 @@ public class Bookmark {
 
 	public void addPC(PC newPC) {
 		this.computerList.add(newPC);
+	}
+
+	@Override
+	public String toString() {
+		return getName();
+	}
+
+	@Override
+	public Enumeration<PC> children() {
+		return new Vector<PC>(computerList).elements();
+	}
+
+	@Override
+	public boolean getAllowsChildren() {
+		return true;
+	}
+
+	@Override
+	public TreeNode getChildAt(int childIndex) {
+		return (PC) computerList.get(childIndex);
+	}
+
+	@Override
+	public int getChildCount() {
+		return computerList.size();
+	}
+
+	@Override
+	public int getIndex(TreeNode node) {
+		return computerList.indexOf((PC)node);
+	}
+
+	@Override
+	public TreeNode getParent() {
+		return (Bookmark) ModelFactory.INSTANCE.getBookmarksTreeModel().getRoot();
+	}
+
+	@Override
+	public boolean isLeaf() {
+		return false;
 	}
 
 }
