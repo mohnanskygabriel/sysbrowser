@@ -1,14 +1,18 @@
 package entities;
 
 import java.util.Enumeration;
+
 import javax.swing.tree.TreeNode;
+
+import factories.ModelFactory;
 
 public class PC implements TreeNode {
 	String name = null;
 	public String connectionType = null;
 	public String ip = null;
 
-	public PC(String name, String ip, String connectionType, String userName, String password) {
+	public PC(String name, String ip, String connectionType, String userName,
+			String password) {
 		this.name = name;
 		this.ip = ip;
 		this.connectionType = connectionType;
@@ -68,7 +72,16 @@ public class PC implements TreeNode {
 
 	@Override
 	public TreeNode getParent() {
-		//TODO
+		while (((RootNode) ModelFactory.INSTANCE.getBookmarkTreeModel()
+				.getRoot()).children().hasMoreElements()) {
+			Bookmark bm = ((RootNode) ModelFactory.INSTANCE
+					.getBookmarkTreeModel().getRoot()).children().nextElement();
+			if (bm.getIndex(this) != -1) {
+				continue;
+			} else {
+				return bm;
+			}
+		}
 		return null;
 	}
 
@@ -76,4 +89,10 @@ public class PC implements TreeNode {
 	public boolean isLeaf() {
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return name;
+	}
+
 }

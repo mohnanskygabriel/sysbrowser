@@ -17,7 +17,8 @@ import java.util.Scanner;
 
 import javax.swing.JRootPane;
 import javax.swing.JTree;
-import models.BookmarksTreeModel;
+import javax.swing.tree.DefaultMutableTreeNode;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.browser.Browser;
@@ -39,6 +40,7 @@ import popups.PopUpFileNotFound;
 import popups.PopUpInfo;
 import entities.Bookmark;
 import entities.PC;
+import entities.RootNode;
 import factories.DAOFactory;
 import factories.ModelFactory;
 
@@ -63,7 +65,6 @@ public class WindowBrowser {
 	 * @wbp.parser.entryPoint
 	 */
 	public void initialize() {
-
 		Display display = Display.getDefault();
 		this.shell = new Shell(display);
 		GridLayout gl_shell = new GridLayout();
@@ -103,7 +104,8 @@ public class WindowBrowser {
 		settingButton.setText("Nastavenia programu");
 
 		Composite composite = new Composite(shell, SWT.EMBEDDED);
-		GridData gd_composite = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+		GridData gd_composite = new GridData(SWT.FILL, SWT.FILL, true, true, 1,
+				1);
 		gd_composite.widthHint = 150;
 		composite.setLayoutData(gd_composite);
 		Frame frame = SWT_AWT.new_Frame(composite);
@@ -114,14 +116,10 @@ public class WindowBrowser {
 		JRootPane rootPane = new JRootPane();
 		panel.add(rootPane);
 
-		JTree tree = new JTree(ModelFactory.INSTANCE.getBookmarksTreeModel());
-		// tree.setRootVisible(false);
+		JTree tree = new JTree(ModelFactory.INSTANCE.getBookmarkTreeModel());
+		tree.setRootVisible(false);
 		rootPane.getContentPane().add(tree, BorderLayout.CENTER);
-		PC comp = new PC();
-		comp.setName("PCName");
-		comp.setIp("1.1.1.1");
-		comp.setConnectionType("RD");
-		((Bookmark)ModelFactory.INSTANCE.getBookmarksTreeModel().getRoot()).addPC(comp);
+		
 		final Browser browser = new Browser(shell, SWT.NORMAL);
 		GridData gd_browser = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		gd_browser.widthHint = 600;
@@ -134,10 +132,12 @@ public class WindowBrowser {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				shell.setEnabled(false);
-				WindowAddBookmark formAddBookmark = new WindowAddBookmark(shell, SWT.DIALOG_TRIM, false);
+				WindowAddBookmark formAddBookmark = new WindowAddBookmark(
+						shell, SWT.DIALOG_TRIM, false);
 				formAddBookmark.open();
 				shell.setEnabled(true);
-				bookmarks = DAOFactory.INSTANCE.getBookmarkDao().getBookmarkAll();
+				bookmarks = DAOFactory.INSTANCE.getBookmarkDao()
+						.getBookmarkAll();
 				for (Bookmark bookmark : bookmarks) {
 					System.out.println(bookmark.getName());
 					System.out.println(bookmark.getUrl());
@@ -360,7 +360,8 @@ public class WindowBrowser {
 		try {
 
 			URLConnection con = url.openConnection();
-			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			BufferedReader in = new BufferedReader(new InputStreamReader(
+					con.getInputStream()));
 			String l;
 			while ((l = in.readLine()) != null) {
 				htmlBuileder.append(l + "\n");
@@ -395,7 +396,8 @@ public class WindowBrowser {
 			Runtime r = Runtime.getRuntime();
 			Process p = r.exec(pingCmd);
 
-			BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			BufferedReader in = new BufferedReader(new InputStreamReader(
+					p.getInputStream()));
 			String inputLine;
 			while ((inputLine = in.readLine()) != null) {
 				// System.out.println(inputLine);
@@ -422,8 +424,8 @@ public class WindowBrowser {
 				vncPath = path;
 			}
 		} catch (FileNotFoundException fnfex) {
-			PopUpFileNotFound popupFileNotFound = new PopUpFileNotFound(shell, SWT.DIALOG_TRIM,
-					fileOfVNCPath.getAbsolutePath());
+			PopUpFileNotFound popupFileNotFound = new PopUpFileNotFound(shell,
+					SWT.DIALOG_TRIM, fileOfVNCPath.getAbsolutePath());
 			popupFileNotFound.open();
 
 			File newVNCPathFile = new File(fileOfVNCPath.getAbsolutePath());
@@ -459,9 +461,10 @@ public class WindowBrowser {
 				try {
 					newBookmarksFile.createNewFile();
 				} catch (IOException e) {
-					PopUpInfo popupFileProblemNeedExit = new PopUpInfo(shell, SWT.DIALOG_TRIM,
-							"Nepodarilo sa otvoriù nov˝ s˙bor, po ukonËenÌ programu vymaû s˙bor " + fileOfVNCPath
-									+ " a reötartni program",
+					PopUpInfo popupFileProblemNeedExit = new PopUpInfo(shell,
+							SWT.DIALOG_TRIM,
+							"Nepodarilo sa otvoriù nov˝ s˙bor, po ukonËenÌ programu vymaû s˙bor "
+									+ fileOfVNCPath + " a reötartni program",
 							"ProblÈm so s˙borom");
 					popupFileProblemNeedExit.open();
 					System.gc();

@@ -68,7 +68,7 @@ public class Bookmark implements TreeNode {
 
 	@Override
 	public TreeNode getChildAt(int childIndex) {
-		return (PC) computerList.get(childIndex);
+		return computerList.get(childIndex);
 	}
 
 	@Override
@@ -83,12 +83,11 @@ public class Bookmark implements TreeNode {
 
 	@Override
 	public TreeNode getParent() {
-		return (Bookmark) ModelFactory.INSTANCE.getBookmarksTreeModel().getRoot();
+		return (TreeNode) ModelFactory.INSTANCE.getBookmarkTreeModel().getRoot();
 	}
 
 	@Override
 	public boolean isLeaf() {
 		return false;
 	}
-
 }

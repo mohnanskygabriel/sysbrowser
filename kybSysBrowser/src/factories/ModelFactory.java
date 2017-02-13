@@ -1,14 +1,18 @@
 package factories;
 
-import models.BookmarksTreeModel;
+import models.BookmarkTreeModel;
+import entities.RootNode;
 
 public enum ModelFactory {
 	INSTANCE;
-	BookmarksTreeModel bookmarksTreeModel;
+	RootNode rootNode;
+	BookmarkTreeModel bookmarkTreeModel;
 
-	public BookmarksTreeModel getBookmarksTreeModel() {
-		if (bookmarksTreeModel == null)
-			bookmarksTreeModel = new BookmarksTreeModel();
-		return bookmarksTreeModel;
+	public BookmarkTreeModel getBookmarkTreeModel() {
+		if (rootNode == null)
+			rootNode = new RootNode();
+		if (bookmarkTreeModel == null)
+			bookmarkTreeModel = new BookmarkTreeModel(rootNode);
+		return bookmarkTreeModel;
 	}
 }
