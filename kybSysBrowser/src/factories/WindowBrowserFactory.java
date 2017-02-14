@@ -7,9 +7,8 @@ public enum WindowBrowserFactory {
 	WindowBrowser windowBrowser;
 
 	public WindowBrowser getWindow_Browser() {
-		if (windowBrowser != null)
-			return windowBrowser;
-
-		return windowBrowser = new WindowBrowser();
+		if (windowBrowser == null)
+			windowBrowser = new WindowBrowser();
+		return windowBrowser;
 	}
 }

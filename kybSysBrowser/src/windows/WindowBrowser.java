@@ -17,7 +17,6 @@ import java.util.Scanner;
 
 import javax.swing.JRootPane;
 import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
@@ -29,7 +28,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
@@ -39,8 +37,6 @@ import org.eclipse.swt.widgets.TreeItem;
 import popups.PopUpFileNotFound;
 import popups.PopUpInfo;
 import entities.Bookmark;
-import entities.PC;
-import entities.RootNode;
 import factories.DAOFactory;
 import factories.ModelFactory;
 
@@ -119,14 +115,19 @@ public class WindowBrowser {
 		JTree tree = new JTree(ModelFactory.INSTANCE.getBookmarkTreeModel());
 		tree.setRootVisible(false);
 		rootPane.getContentPane().add(tree, BorderLayout.CENTER);
-		
+		try {
+			DAOFactory.INSTANCE.getBookmarkDao().deleteBookmark(
+					DAOFactory.INSTANCE.getBookmarkDao().getBookmarkAll()
+							.get(0));
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+
 		final Browser browser = new Browser(shell, SWT.NORMAL);
 		GridData gd_browser = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		gd_browser.widthHint = 600;
 		gd_browser.heightHint = 540;
 		browser.setLayoutData(gd_browser);
-		new Label(shell, SWT.NONE);
-		new Label(shell, SWT.NONE);
 
 		addBookmarkButton.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -250,51 +251,11 @@ public class WindowBrowser {
 		// }
 		// });
 
-		/*
-		 * tree.addSelectionListener(new SelectionAdapter() { public void
-		 * widgetSelected(SelectionEvent e) { TreeItem selected = (TreeItem)
-		 * e.item; currentSelection = selected; if
-		 * (bookmarkFromString.containsKey(selected.getText())) {
-		 * addPCButton.setEnabled(true); deleteItemButton.setEnabled(true);
-		 * remoteDesktopButton.setEnabled(false); vncButton.setEnabled(false);
-		 * pingButton.setEnabled(false); if
-		 * (bookmarkFromString.get(selected.getText()).getUrl()
-		 * .equals("http://10.4.85.13/ml1_kis/")) { URL url = null; try { url =
-		 * new URL("http://10.4.85.13/ml1_kis/"); } catch (MalformedURLException
-		 * e1) { e1.printStackTrace(); } setSpecialTable(browser, url); } else
-		 * if (bookmarkFromString.get(selected.getText())
-		 * .getUrl().equals("http://10.4.85.160/tva_kis/")) { URL url = null;
-		 * try { url = new URL("http://10.4.85.160/tva_kis/"); } catch
-		 * (MalformedURLException e1) { e1.printStackTrace(); }
-		 * setSpecialTable(browser, url); } else { if
-		 * (bookmarkFromString.get(selected.getText()).getUrl() == null ||
-		 * bookmarkFromString.get(selected.getText())
-		 * .getUrl().trim().equals("http://") ||
-		 * bookmarkFromString.get(selected.getText())
-		 * .getUrl().trim().equals("")) { // browser.setVisible(false); } else {
-		 * browser.setVisible(true); browser.setUrl(bookmarkFromString.get(
-		 * selected.getText()).getUrl()); if
-		 * (selected.getText().equals("ML3 KIS")) {
-		 * System.out.println(browser.getText()); } } } } else {
-		 * addPCButton.setEnabled(false); pingButton.setEnabled(true); for (PC
-		 * item : pcFromTreeItem.values()) { item.getConnectionType(); }
-		 * 
-		 * if (pcFromTreeItem.get(selected).connectionType .equals("VNC")) {
-		 * vncButton.setEnabled(true); remoteDesktopButton.setEnabled(false); }
-		 * else { if (pcFromTreeItem.get(selected).connectionType .equals("RD"))
-		 * { vncButton.setEnabled(false); remoteDesktopButton.setEnabled(true);
-		 * } else { vncButton.setEnabled(false);
-		 * remoteDesktopButton.setEnabled(false); } } } } });
-		 */
-
 		refreshVNCPath("");
 		// refreshBookmarks();
 		shell.open();
 		shell.layout();
-		/*
-		 * for (TreeItem treeItem : tree.getItems()) {
-		 * treeItem.setExpanded(false); }
-		 */
+
 		while (!shell.isDisposed()) {
 			if (bookmarks.isEmpty()) {
 				addPCButton.setEnabled(false);
@@ -311,49 +272,6 @@ public class WindowBrowser {
 			}
 		}
 	}
-
-	/*
-	 * public void refreshBookmarks() { // po vymazaní tree currentSelection
-	 * neexistuje if (currentSelection != null) { if
-	 * (!currentSelection.isDisposed() && currentSelection.getParentItem() !=
-	 * null) { if (!currentSelection.getParentItem().isDisposed()) {
-	 * lastSelectedBookmarkName = currentSelection.getParentItem() .getText(); }
-	 * } else { if (!currentSelection.isDisposed()) lastSelectedBookmarkName =
-	 * currentSelection.getText(); } }
-	 */
-
-	// funkcia pre naèítanie súboru fileOfBookmarks
-	/*
-	 * getBookmarksAndPCFromFile(); pcFromTreeItem = new HashMap<TreeItem,
-	 * PC>(); LinkedList<String> sortedBookmarks = new LinkedList<String>(
-	 * bookmarkFromString.keySet()); Collections.sort(sortedBookmarks);
-	 * bookmarkToTreeItem = new HashMap<String, TreeItem>(); // mažem strom a
-	 * vytváram nový tree.clearAll(true); tree.setItemCount(0); TreeItem newItem
-	 * = null;
-	 * 
-	 * for (String bookmarkName : sortedBookmarks) { newItem =
-	 * makeNewTreeItem(tree, bookmarkName); bookmarkToTreeItem.put(bookmarkName,
-	 * newItem); tree.showItem(newItem); }
-	 * 
-	 * for (String bookmark : sortedBookmarks) { List<PC> listOfComputers =
-	 * bookmarkFromString.get(bookmark) .getComputerList(); for (PC pc :
-	 * listOfComputers) { TreeItem newTreeItem = new TreeItem(
-	 * bookmarkToTreeItem.get(bookmark), SWT.NONE);
-	 * newTreeItem.setText(pc.getName()); pcFromTreeItem.put(newTreeItem, pc);
-	 * tree.showItem(newTreeItem); } } // nastavím poslednú vybranú hodnotu, ak
-	 * neexistuje jeho parent/topItem if (currentSelection != null) { Event ev =
-	 * new Event(); if
-	 * (bookmarkToTreeItem.containsKey(lastSelectedBookmarkName)) {
-	 * tree.setSelection(bookmarkToTreeItem .get(lastSelectedBookmarkName));
-	 * ev.item = bookmarkToTreeItem.get(lastSelectedBookmarkName); } else { if
-	 * (tree.getTopItem() != null) { tree.setSelection(tree.getTopItem());
-	 * ev.item = tree.getTopItem(); }
-	 * 
-	 * } // informujem listenerov stromu if (tree.getTopItem() != null)
-	 * tree.notifyListeners(SWT.Selection, ev); } for (TreeItem treeItem :
-	 * tree.getItems()) { treeItem.setExpanded(false); } // currentSelection =
-	 * null; }
-	 */
 
 	private void setSpecialTable(Browser browser, URL url) {
 		StringBuilder htmlBuileder = new StringBuilder();
@@ -480,25 +398,9 @@ public class WindowBrowser {
 		}
 	}
 
-	/*
-	 * public TreeItem getCurrentSelection() { if (tree != null &&
-	 * tree.getSelection() != null && tree.getSelection().length > 0) return
-	 * tree.getSelection()[0];
-	 * 
-	 * return null; }
-	 */
-
 	public File getFileOfBookmarks() {
 		return fileOfBookmarks;
 	}
-
-	// public Map<TreeItem, PC> getPcFromTreeItem() {
-	// return pcFromTreeItem;
-	// }
-	//
-	// public void setPcFromTreeItem(Map<TreeItem, PC> pcFromTreeItem) {
-	// this.pcFromTreeItem = pcFromTreeItem;
-	// }
 
 	public Shell getShell() {
 		return shell;

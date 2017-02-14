@@ -9,6 +9,7 @@ import javax.swing.tree.TreeNode;
 import factories.ModelFactory;
 
 public class Bookmark implements TreeNode {
+	private int id = hashCode();
 	private String name = null;
 	private String url = null;
 	private LinkedList<PC> computerList = null;
@@ -21,6 +22,10 @@ public class Bookmark implements TreeNode {
 
 	public Bookmark() {
 
+	}
+
+	public int getId() {
+		return id;
 	}
 
 	public String getName() {
@@ -78,12 +83,13 @@ public class Bookmark implements TreeNode {
 
 	@Override
 	public int getIndex(TreeNode node) {
-		return computerList.indexOf((PC)node);
+		return computerList.indexOf((PC) node);
 	}
 
 	@Override
 	public TreeNode getParent() {
-		return (TreeNode) ModelFactory.INSTANCE.getBookmarkTreeModel().getRoot();
+		return (TreeNode) ModelFactory.INSTANCE.getBookmarkTreeModel()
+				.getRoot();
 	}
 
 	@Override
