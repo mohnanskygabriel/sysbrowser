@@ -1,7 +1,6 @@
 package popups;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -14,9 +13,9 @@ import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.TreeItem;
 
-import windows.WindowBrowser;
+import entities.Bookmark;
+import entities.PC;
 import factories.DAOFactory;
 import factories.WindowBrowserFactory;
 
@@ -24,10 +23,6 @@ public class PopUpDeleteItemFromTreeDialog extends Dialog {
 
 	private Object result;
 	private Shell shell;
-	private WindowBrowser browser = WindowBrowserFactory.INSTANCE
-			.getWindow_Browser();
-
-	/* TreeItem selectedTreeItem = browser.getCurrentSelection(); */
 
 	public PopUpDeleteItemFromTreeDialog(Shell parent, int style) {
 		super(parent, style);
@@ -67,33 +62,44 @@ public class PopUpDeleteItemFromTreeDialog extends Dialog {
 		Button noButton = new Button(shell, SWT.PUSH);
 		noButton.setLayoutData(new RowData(100, SWT.DEFAULT));
 		noButton.setText("Nie");
-		/*
-		 * try { selectedTreeItem.getParentItem().getText();
-		 * lblMessage.setText("UrËite chces vymazaù poloûku " +
-		 * selectedTreeItem.getText() + " ?"); } catch (NullPointerException ne)
-		 * { lblMessage.setText("UrËite chces vymazaù poloûku " +
-		 * selectedTreeItem.getText() +
-		 * " ? Vymaû˙ sa aj pridelenÈ poËÌtaËe v zozname!"); }
-		 */
 
-		/*
-		 * yesButton.addSelectionListener(new SelectionAdapter() {
-		 * 
-		 * @Override public void widgetSelected(SelectionEvent e) { boolean
-		 * isBookmark = true; if (!browser.getBookmarkFromString().containsKey(
-		 * selectedTreeItem.getText())) isBookmark = false; try { if
-		 * (isBookmark) { DAOFactory.INSTANCE.getBookmarkDao().deleteBookmark(
-		 * browser.getBookmarkFromString() .get(browser.getCurrentSelection()
-		 * .getText())); } else { DAOFactory.INSTANCE.getPCDAO().deletePC(
-		 * browser.getPcFromTreeItem().get( selectedTreeItem)); } } catch
-		 * (FileNotFoundException fNfEx) { PopUpFileNotFound popUpFnf = new
-		 * PopUpFileNotFound(shell, SWT.DIALOG_TRIM,
-		 * browser.getFileOfBookmarks() .getAbsolutePath()); popUpFnf.open(); }
-		 * catch (IOException iox) { PopUpIOExceptionFileWriterError popUpIOEx =
-		 * new PopUpIOExceptionFileWriterError( shell, SWT.DIALOG_TRIM, browser
-		 * .getFileOfBookmarks().getAbsolutePath()); popUpIOEx.open(); } finally
-		 * { browser.setCurrentSelection(null); shell.close(); } } });
-		 */
+		Object selectionInTree = WindowBrowserFactory.INSTANCE
+				.getWindow_Browser().getTree().getSelectionPath()
+				.getLastPathComponent();
+
+		if (selectionInTree.getClass() == PC.class)
+			lblMessage.setText("UrËite chces vymazaù poloûku "
+					+ selectionInTree.toString()
+					+ " ? Vymaû˙ sa aj pridelenÈ poËÌtaËe v zozname!");
+		else
+			lblMessage.setText("UrËite chces vymazaù poloûku "
+					+ selectionInTree.toString() + " ?");
+
+		yesButton.addSelectionListener(new SelectionAdapter() {
+
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				try {
+					if (selectionInTree.getClass() == Bookmark.class) {
+						DAOFactory.INSTANCE.getBookmarkDao().deleteBookmark(
+								(Bookmark) selectionInTree);
+					} else {
+						DAOFactory.INSTANCE.getPCDAO().deletePC(
+								(PC) selectionInTree);
+					}
+				} catch (FileNotFoundException fnfEx) {
+					PopUpFileNotFound popupFnF = new PopUpFileNotFound(
+							WindowBrowserFactory.INSTANCE.getWindow_Browser()
+									.getShell(), SWT.DIALOG_TRIM,
+							WindowBrowserFactory.INSTANCE.getWindow_Browser()
+									.getFileOfBookmarks().getAbsolutePath());
+					popupFnF.open();
+				} finally {
+					shell.close();
+				}
+
+			}
+		});
 
 		noButton.addSelectionListener(new SelectionAdapter() {
 			@Override

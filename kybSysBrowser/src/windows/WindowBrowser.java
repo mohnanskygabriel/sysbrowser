@@ -11,8 +11,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Scanner;
 
 import javax.swing.JRootPane;
@@ -34,30 +32,27 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
+import popups.PopUpDeleteItemFromTreeDialog;
 import popups.PopUpFileNotFound;
 import popups.PopUpInfo;
-import entities.Bookmark;
-import factories.DAOFactory;
 import factories.ModelFactory;
 
 public class WindowBrowser {
 
 	/*
-	 * TODO Tree prerobit na JTree a dat TreeModel pouzit JSON na ukladanie
-	 * entit bookmark a pc VykomentovanÈ inötanËnÈ premennÈ zruöiù a robiù iba s
-	 * tree v ostatn˝ch triedach getTree.getItems naprÌklad pouûÌvaù, miesto
-	 * currentselection tieû pÌtaù tree selectedItem ak moûno tak aj mapu
-	 * stringov na bookmarky uplne zruöiù a nahradiù modelom pre tree pre
-	 * premenne ciest suborov vytvoriù entitu settings a
+	 * TODO pre premenne ciest suborov vytvoriù entitu settings vytvoriet triedu
+	 * ktora bude uchovavat vsetky riesenia exceptionov a na riesenie
+	 * exceptionov uz iba volat z tetjto triedy dane riesenie vynimky
 	 */
+
 	private File fileOfBookmarks = new File("src/bookmarks.txt");
 	private File fileOfVNCPath = new File("src/vncPath.txt");
 	private String vncPath = "";
-	private List<Bookmark> bookmarks = new LinkedList<Bookmark>();
-
+	private JTree tree;
 	private Shell shell = null;
 
 	/**
+	 * 
 	 * @wbp.parser.entryPoint
 	 */
 	public void initialize() {
@@ -112,16 +107,9 @@ public class WindowBrowser {
 		JRootPane rootPane = new JRootPane();
 		panel.add(rootPane);
 
-		JTree tree = new JTree(ModelFactory.INSTANCE.getBookmarkTreeModel());
+		tree = new JTree(ModelFactory.INSTANCE.getBookmarkTreeModel());
 		tree.setRootVisible(false);
 		rootPane.getContentPane().add(tree, BorderLayout.CENTER);
-		try {
-			DAOFactory.INSTANCE.getBookmarkDao().deleteBookmark(
-					DAOFactory.INSTANCE.getBookmarkDao().getBookmarkAll()
-							.get(0));
-		} catch (Exception e1) {
-			e1.printStackTrace();
-		}
 
 		final Browser browser = new Browser(shell, SWT.NORMAL);
 		GridData gd_browser = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
@@ -136,13 +124,8 @@ public class WindowBrowser {
 				WindowAddBookmark formAddBookmark = new WindowAddBookmark(
 						shell, SWT.DIALOG_TRIM, false);
 				formAddBookmark.open();
+				ModelFactory.INSTANCE.getBookmarkTreeModel().reload();
 				shell.setEnabled(true);
-				bookmarks = DAOFactory.INSTANCE.getBookmarkDao()
-						.getBookmarkAll();
-				for (Bookmark bookmark : bookmarks) {
-					System.out.println(bookmark.getName());
-					System.out.println(bookmark.getUrl());
-				}
 			}
 		});
 
@@ -179,18 +162,17 @@ public class WindowBrowser {
 		// }
 		// });
 		//
-		// deleteItemButton.addSelectionListener(new SelectionAdapter() {
-		// @Override
-		// public void widgetSelected(SelectionEvent e) {
-		// shell.setEnabled(false);
-		// PopUpDeleteItemFromTreeDialog deleteItemDialog = new
-		// PopUpDeleteItemFromTreeDialog(
-		// shell, SWT.DIALOG_TRIM);
-		// deleteItemDialog.open();
-		// shell.setEnabled(true);
-		// // refreshBookmarks();
-		// }
-		// });
+		deleteItemButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				shell.setEnabled(false);
+				PopUpDeleteItemFromTreeDialog deleteItemDialog = new PopUpDeleteItemFromTreeDialog(
+						shell, SWT.DIALOG_TRIM);
+				deleteItemDialog.open();
+				ModelFactory.INSTANCE.getBookmarkTreeModel().reload();
+				shell.setEnabled(true);
+			}
+		});
 		//
 		// pingButton.addSelectionListener(new SelectionAdapter() {
 		// @Override
@@ -252,12 +234,11 @@ public class WindowBrowser {
 		// });
 
 		refreshVNCPath("");
-		// refreshBookmarks();
 		shell.open();
 		shell.layout();
 
 		while (!shell.isDisposed()) {
-			if (bookmarks.isEmpty()) {
+			if (tree.getSelectionCount() != 1) {
 				addPCButton.setEnabled(false);
 				deleteItemButton.setEnabled(false);
 				editItemButton.setEnabled(false);
@@ -265,7 +246,12 @@ public class WindowBrowser {
 				vncButton.setEnabled(false);
 				remoteDesktopButton.setEnabled(false);
 			} else {
+				addPCButton.setEnabled(true);
+				deleteItemButton.setEnabled(true);
 				editItemButton.setEnabled(true);
+				pingButton.setEnabled(true);
+				vncButton.setEnabled(true);
+				remoteDesktopButton.setEnabled(true);
 			}
 			if (!display.readAndDispatch()) {
 				display.sleep();
@@ -412,6 +398,10 @@ public class WindowBrowser {
 
 	public void setVncPath(String vncPath) {
 		this.vncPath = vncPath;
+	}
+
+	public JTree getTree() {
+		return tree;
 	}
 
 }

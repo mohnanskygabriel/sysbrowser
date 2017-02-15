@@ -7,6 +7,7 @@ import javax.swing.tree.TreeNode;
 import factories.ModelFactory;
 
 public class PC implements TreeNode {
+	int id = hashCode();
 	String name = null;
 	public String connectionType = null;
 	public String ip = null;
@@ -19,6 +20,10 @@ public class PC implements TreeNode {
 	}
 
 	public PC() {
+	}
+	
+	public int getId() {
+		return id;
 	}
 
 	public String getName() {

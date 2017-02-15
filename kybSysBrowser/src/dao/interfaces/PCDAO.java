@@ -1,6 +1,6 @@
 package dao.interfaces;
 
-import java.io.IOException;
+import java.io.FileNotFoundException;
 
 import entities.Bookmark;
 import entities.PC;
@@ -9,7 +9,7 @@ public interface PCDAO {
 
 	public void insertPC(PC pc);
 
-	public void deletePC(PC pc) throws IOException;
+	public void deletePC(PC pc) throws FileNotFoundException;
 	
 	public void editPC(PC pcOld, PC pcNew);
 

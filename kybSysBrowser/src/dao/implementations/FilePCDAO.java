@@ -1,20 +1,12 @@
 package dao.implementations;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Scanner;
+import java.io.FileNotFoundException;
 
-import windows.WindowBrowser;
 import dao.interfaces.PCDAO;
 import entities.Bookmark;
 import entities.PC;
-import factories.WindowBrowserFactory;
 
 public class FilePCDAO implements PCDAO {
-	private WindowBrowser browser = WindowBrowserFactory.INSTANCE
-			.getWindow_Browser();
-	private final File fileOfBookmarks = browser.getFileOfBookmarks();
 
 	@Override
 	public void insertPC(PC pc) {
@@ -22,7 +14,7 @@ public class FilePCDAO implements PCDAO {
 	}
 
 	@Override
-	public void deletePC(PC pc) throws IOException {
+	public void deletePC(PC pc) throws FileNotFoundException {
 		
 	}
 

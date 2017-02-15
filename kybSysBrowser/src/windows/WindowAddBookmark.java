@@ -2,7 +2,6 @@ package windows;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Set;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -17,11 +16,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import popups.PopUpInfo;
 import popups.PopUpInputMissing;
 import entities.Bookmark;
 import factories.DAOFactory;
-import factories.WindowBrowserFactory;
 
 public class WindowAddBookmark extends Dialog {
 
@@ -44,14 +41,6 @@ public class WindowAddBookmark extends Dialog {
 	}
 
 	public Object open() {
-		WindowBrowser browser = WindowBrowserFactory.INSTANCE
-				.getWindow_Browser();
-		/*if (browser.getCurrentSelection() == null) {
-			currentBookmark = null;
-		} else {
-			currentBookmark = browser.getBookmarkFromString().get(
-					browser.getCurrentSelection().getText());
-		}*/
 		createContents();
 		Display display = getParent().getDisplay();
 		Rectangle parentBounds = parentShell.getBounds();
@@ -109,7 +98,6 @@ public class WindowAddBookmark extends Dialog {
 		btnSave.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-		//		checkBookmarkExistence();
 				checkInput();
 				try {
 					if (!editMode)
@@ -156,21 +144,4 @@ public class WindowAddBookmark extends Dialog {
 		}
 	}
 
-	// private void checkBookmarkExistence() {
-	// WindowBrowser browser = WindowBrowserFactory.INSTANCE
-	// .getWindow_Browser();
-	// Set<String> bookmarkNameSet = browser.getBookmarkFromString().keySet();
-	// for (String bookmarkName : bookmarkNameSet) {
-	// if (bookmarkName.equals(inputUserBookmarkName.getText())
-	// && browser.getBookmarkFromString().get(
-	// inputUserBookmarkName.getText()) != currentBookmark) {
-	// PopUpInfo popUpItemExist = new PopUpInfo(shell,
-	// SWT.DIALOG_TRIM, inputUserBookmarkName.getText()
-	// + " už existuje, zadaj iný vstup!!!",
-	// "Vstup už exisstuje");
-	// popUpItemExist.open();
-	// return;
-	// }
-	// }
-	// }
 }

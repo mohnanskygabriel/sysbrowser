@@ -1,6 +1,8 @@
 package entities;
 
+import java.io.FileNotFoundException;
 import java.util.Enumeration;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
@@ -12,13 +14,25 @@ public class RootNode implements TreeNode {
 
 	@Override
 	public TreeNode getChildAt(int childIndex) {
-		return DAOFactory.INSTANCE.getBookmarkDao().getBookmarkAll()
-				.get(childIndex);
+		try {
+			return DAOFactory.INSTANCE.getBookmarkDao().getBookmarkAll()
+					.get(childIndex);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	@Override
 	public int getChildCount() {
-		return DAOFactory.INSTANCE.getBookmarkDao().getBookmarkAll().size();
+		try {
+			return DAOFactory.INSTANCE.getBookmarkDao().getBookmarkAll().size();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return -1;
 	}
 
 	@Override
@@ -28,8 +42,13 @@ public class RootNode implements TreeNode {
 
 	@Override
 	public int getIndex(TreeNode node) {
-		List<Bookmark> list = DAOFactory.INSTANCE.getBookmarkDao()
-				.getBookmarkAll();
+		List<Bookmark> list = new LinkedList<Bookmark>();
+		try {
+			list = DAOFactory.INSTANCE.getBookmarkDao().getBookmarkAll();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return list.indexOf(node);
 	}
 
@@ -45,8 +64,13 @@ public class RootNode implements TreeNode {
 
 	@Override
 	public Enumeration<Bookmark> children() {
-		List<Bookmark> list = DAOFactory.INSTANCE.getBookmarkDao()
-				.getBookmarkAll();
+		List<Bookmark> list = new LinkedList<Bookmark>();
+		try {
+			list = DAOFactory.INSTANCE.getBookmarkDao().getBookmarkAll();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return new Vector<Bookmark>(list).elements();
 	}
 

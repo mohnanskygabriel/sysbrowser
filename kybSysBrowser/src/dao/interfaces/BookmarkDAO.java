@@ -7,14 +7,13 @@ import entities.Bookmark;
 
 public interface BookmarkDAO {
 
-	public void insertBookmark(Bookmark bookmark) throws FileNotFoundException,
-			IOException;
+	public void insertBookmark(Bookmark bookmark) throws FileNotFoundException;
 
-	public void deleteBookmark(Bookmark bookmark) throws FileNotFoundException, IOException;
+	public void deleteBookmark(Bookmark bookmark) throws FileNotFoundException;
 
 	public void editBookmark(Bookmark oldBookmark, Bookmark newBookmark);
 
-	public List<Bookmark> getBookmarkAll();
+	public List<Bookmark> getBookmarkAll() throws FileNotFoundException;
 
 	Bookmark getBookmark(Bookmark bookmark) throws FileNotFoundException,
 			IOException;
