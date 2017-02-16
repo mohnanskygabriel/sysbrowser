@@ -1,0 +1,7 @@
+{
+  "File of bookmarks": "src/bookmarks.txt"
+}{
+  "VNC path": "src/vncPath.txt"
+}{
+  "SAMPLE": "SOMESTRING /// "
+}
