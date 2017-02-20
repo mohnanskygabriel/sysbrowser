@@ -1,10 +1,10 @@
 package kybsysbrowser.dao;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.List;
 
 import kybsysbrowser.entity.Bookmark;
+import kybsysbrowser.entity.PC;
 
 public interface BookmarkDAO {
 
@@ -12,11 +12,14 @@ public interface BookmarkDAO {
 
 	public void deleteBookmark(Bookmark bookmark) throws FileNotFoundException;
 
-	public void editBookmark(Bookmark oldBookmark, Bookmark newBookmark);
+	public void editBookmark(Bookmark newBookmark) throws FileNotFoundException;
 
 	public List<Bookmark> getBookmarkAll() throws FileNotFoundException;
 
-	Bookmark getBookmark(Bookmark bookmark) throws FileNotFoundException,
-			IOException;
+	public Bookmark getBookmark(Bookmark bookmark) throws FileNotFoundException;
+
+	public Bookmark getBookmarkById(int bookmarkId) throws FileNotFoundException;
+
+	public Bookmark getBookmarkContainingPC(PC pc);
 
 }

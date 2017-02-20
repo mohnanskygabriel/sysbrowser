@@ -7,7 +7,7 @@ import kybsysbrowser.dialog.exceptionSolving.FileNotFoundDialog;
 import kybsysbrowser.entity.Bookmark;
 import kybsysbrowser.entity.PC;
 import kybsysbrowser.factory.DAOFactory;
-import kybsysbrowser.factory.WindowBrowserFactory;
+import kybsysbrowser.factory.WindowFactory;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -65,11 +65,10 @@ public class DeleteItemFromTreeDialog extends Dialog {
 		noButton.setLayoutData(new RowData(100, SWT.DEFAULT));
 		noButton.setText("Nie");
 
-		Object selectionInTree = WindowBrowserFactory.INSTANCE
-				.getWindow_Browser().getTree().getSelectionPath()
-				.getLastPathComponent();
+		Object selectionInTree = WindowFactory.INSTANCE.getWindow_Browser()
+				.getTree().getLastSelectedPathComponent();
 
-		if (selectionInTree.getClass() == PC.class)
+		if (selectionInTree.getClass() == Bookmark.class)
 			lblMessage.setText("UrËite chces vymazaù poloûku "
 					+ selectionInTree.toString()
 					+ " ? Vymaû˙ sa aj pridelenÈ poËÌtaËe v zozname!");
@@ -91,14 +90,12 @@ public class DeleteItemFromTreeDialog extends Dialog {
 					}
 				} catch (FileNotFoundException fnfEx) {
 					FileNotFoundDialog popupFnF = null;
-					popupFnF = new FileNotFoundDialog(
-							WindowBrowserFactory.INSTANCE
-									.getWindow_Browser().getShell(),
-							SWT.DIALOG_TRIM, new File(DAOFactory.INSTANCE
-									.getSettingDAO().getSetting(
-											"File of bookmarks"))
+					popupFnF = new FileNotFoundDialog(WindowFactory.INSTANCE
+							.getWindow_Browser().getShell(), SWT.DIALOG_TRIM,
+							new File(DAOFactory.INSTANCE.getSettingDAO()
+									.getSetting("File of bookmarks"))
 									.getAbsolutePath());
-					popupFnF.open();					
+					popupFnF.open();
 				} finally {
 					shell.close();
 				}

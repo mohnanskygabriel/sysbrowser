@@ -1,7 +1,6 @@
 package kybsysbrowser.dialog;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
 import kybsysbrowser.dialog.exceptionSolving.InputMissingDialog;
 import kybsysbrowser.entity.Bookmark;
@@ -94,7 +93,7 @@ public class AddBookmarkDialog extends Dialog {
 			btnSave.setText("Pridaù systÈm");
 			inputUserURL.setText("http://");
 		}
-		
+
 		btnSave.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -106,14 +105,11 @@ public class AddBookmarkDialog extends Dialog {
 										inputUserURL.getText()));
 					else
 						DAOFactory.INSTANCE.getBookmarkDao().editBookmark(
-								currentBookmark,
 								new Bookmark(inputUserBookmarkName.getText(),
 										inputUserURL.getText()));
 
 				} catch (FileNotFoundException fnfEx) {
 					fnfEx.printStackTrace();
-				} catch (IOException ioEx) {
-					ioEx.printStackTrace();
 				} finally {
 					shell.close();
 				}
@@ -137,8 +133,8 @@ public class AddBookmarkDialog extends Dialog {
 			}
 		}
 		if (missingInputs != null) {
-			InputMissingDialog popUpMissingInputs = new InputMissingDialog(shell,
-					SWT.DIALOG_TRIM, missingInputs);
+			InputMissingDialog popUpMissingInputs = new InputMissingDialog(
+					shell, SWT.DIALOG_TRIM, missingInputs);
 			popUpMissingInputs.open();
 			return;
 		}

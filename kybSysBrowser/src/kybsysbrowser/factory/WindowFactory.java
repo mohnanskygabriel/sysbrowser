@@ -2,7 +2,7 @@ package kybsysbrowser.factory;
 
 import kybsysbrowser.frame.MainFrame;
 
-public enum WindowBrowserFactory {
+public enum WindowFactory {
 	INSTANCE;
 	MainFrame windowBrowser;
 

@@ -7,7 +7,7 @@ import kybsysbrowser.entity.PC;
 
 public interface PCDAO {
 
-	public void insertPC(PC pc);
+	public void insertPC(PC pc, int parentId) throws FileNotFoundException;
 
 	public void deletePC(PC pc) throws FileNotFoundException;
 	

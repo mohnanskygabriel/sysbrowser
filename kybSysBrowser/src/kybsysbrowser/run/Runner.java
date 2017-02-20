@@ -1,10 +1,10 @@
 package kybsysbrowser.run;
 
-import kybsysbrowser.factory.WindowBrowserFactory;
+import kybsysbrowser.factory.WindowFactory;
 
 public class Runner {
 
 	public static void main(String[] args) {
-		WindowBrowserFactory.INSTANCE.getWindow_Browser().initialize();
+		WindowFactory.INSTANCE.getWindow_Browser().initialize();
 	}
 }

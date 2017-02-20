@@ -96,4 +96,17 @@ public class Bookmark implements TreeNode {
 	public boolean isLeaf() {
 		return false;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Bookmark other = (Bookmark) obj;
+		if (id != other.id)
+			return false;
+		return true;
+	}
+		
 }

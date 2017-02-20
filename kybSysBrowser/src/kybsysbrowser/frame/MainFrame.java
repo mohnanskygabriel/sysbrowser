@@ -11,10 +11,12 @@ import java.net.URLConnection;
 
 import javax.swing.JRootPane;
 import javax.swing.JTree;
+import javax.swing.tree.TreeNode;
 
 import kybsysbrowser.dialog.AddBookmarkDialog;
+import kybsysbrowser.dialog.AddPCDialog;
 import kybsysbrowser.dialog.DeleteItemFromTreeDialog;
-import kybsysbrowser.entity.Bookmark;
+import kybsysbrowser.dialog.SettingsDialog;
 import kybsysbrowser.factory.ModelFactory;
 
 import org.eclipse.swt.SWT;
@@ -34,9 +36,7 @@ import org.eclipse.swt.widgets.Shell;
 public class MainFrame {
 
 	/*
-	 * TODO: 
-	 * vncPatch treba dat do settings rovno a nie do vncPath suboru
-	 * urobit pridavanie a editaciu novych PC dorobit jedinecne id pre
+	 * TODO: urobit pridavanie a editaciu novych PC dorobit jedinecne id pre
 	 * entity kedze moze sa vygenerovat rovnaky hash ako v subore uz nejaka
 	 * entita ma po dalsom spusteni programu vytvorit triedu ktora bude
 	 * uchovavat vsetky riesenia exceptionov a na riesenie exceptionov uz iba
@@ -119,23 +119,25 @@ public class MainFrame {
 				AddBookmarkDialog formAddBookmark = new AddBookmarkDialog(
 						shell, SWT.DIALOG_TRIM, false);
 				formAddBookmark.open();
-				ModelFactory.INSTANCE.getBookmarkTreeModel().reload();
+				ModelFactory.INSTANCE.getBookmarkTreeModel()
+						.nodeStructureChanged(
+								(TreeNode) tree.getModel().getRoot());
+				;
 				shell.setEnabled(true);
 			}
 		});
 
-		// addPCButton.addSelectionListener(new SelectionAdapter() {
-		// @Override
-		// public void widgetSelected(SelectionEvent e) {
-		// shell.setEnabled(false);
-		// WindowAddPC addPCDialog = new WindowAddPC(addPCButton
-		// .getParent().getShell(), SWT.DIALOG_TRIM,
-		// currentSelection, false, null);
-		// addPCDialog.open();
-		// shell.setEnabled(true);
-		// // refreshBookmarks();
-		// }
-		// });
+		addPCButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				shell.setEnabled(false);
+				AddPCDialog addPCDialog = new AddPCDialog(shell,
+						SWT.DIALOG_TRIM, false);
+				addPCDialog.open();
+				ModelFactory.INSTANCE.getBookmarkTreeModel().reload();
+				shell.setEnabled(true);
+			}
+		});
 		//
 		// editItemButton.addSelectionListener(new SelectionAdapter() {
 		// @Override
@@ -164,7 +166,11 @@ public class MainFrame {
 				DeleteItemFromTreeDialog deleteItemDialog = new DeleteItemFromTreeDialog(
 						shell, SWT.DIALOG_TRIM);
 				deleteItemDialog.open();
-				ModelFactory.INSTANCE.getBookmarkTreeModel().reload();
+				ModelFactory.INSTANCE
+						.getBookmarkTreeModel()
+						.nodeStructureChanged(
+								((TreeNode) tree.getLastSelectedPathComponent())
+										.getParent());
 				shell.setEnabled(true);
 			}
 		});
@@ -217,16 +223,16 @@ public class MainFrame {
 		// }
 		// });
 		//
-		// settingButton.addSelectionListener(new SelectionAdapter() {
-		// @Override
-		// public void widgetSelected(SelectionEvent e) {
-		// shell.setEnabled(false);
-		// WindowSettings settingsWindow = new WindowSettings(shell,
-		// SWT.TITLE);
-		// settingsWindow.open();
-		// shell.setEnabled(true);
-		// }
-		// });
+		settingButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				shell.setEnabled(false);
+				SettingsDialog settingsWindow = new SettingsDialog(shell,
+						SWT.TITLE);
+				settingsWindow.open();
+				shell.setEnabled(true);
+			}
+		});
 
 		shell.open();
 		shell.layout();
@@ -292,13 +298,12 @@ public class MainFrame {
 					p.getInputStream()));
 			String inputLine;
 			while ((inputLine = in.readLine()) != null) {
-				// System.out.println(inputLine);
 				pingResult += inputLine;
 				pingResult += "\n";
 			}
 			in.close();
 		} catch (IOException e) {
-			System.out.println(e);
+			e.printStackTrace();
 		}
 		return pingResult;
 	}

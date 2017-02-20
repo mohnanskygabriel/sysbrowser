@@ -1,16 +1,15 @@
 package kybsysbrowser.dialog;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Scanner;
 
-import kybsysbrowser.dialog.exceptionSolving.FileNotFoundDialog;
-import kybsysbrowser.dialog.exceptionSolving.IOExceptionFileWriterErrorDialog;
+import javax.swing.tree.TreeNode;
+
 import kybsysbrowser.dialog.exceptionSolving.InfoDialog;
+import kybsysbrowser.entity.Bookmark;
 import kybsysbrowser.entity.PC;
 import kybsysbrowser.factory.DAOFactory;
+import kybsysbrowser.factory.ModelFactory;
+import kybsysbrowser.factory.WindowFactory;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -23,31 +22,25 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.TreeItem;
 
 public class AddPCDialog extends Dialog {
 
 	private Object result;
 	private Shell shell;
-	private TreeItem parentItem;
 	private Text textPCName;
 	private Text textIPAdress;
-	private File fileOfBookmarks;
 	private String connectionType = "RD";
 	private boolean editMode;
 	private PC currentPC;
 	private Shell parentShell;
 
-	public AddPCDialog(Shell parent, int style, TreeItem parentItem,
-			boolean editMode, PC currentPC) {
+	public AddPCDialog(Shell parent, int style, boolean editMode) {
 		super(parent, style);
-		this.parentItem = parentItem;
-		this.fileOfBookmarks = new File(DAOFactory.INSTANCE.getSettingDAO()
-				.getSetting("File of bookmarks"));
 		this.editMode = editMode;
-		this.currentPC = currentPC;
 		this.parentShell = parent;
-		setText("Pridanie poèítaèa k systému " + parentItem.getText());
+		setText("Pridanie poèítaèa k systému "
+				+ WindowFactory.INSTANCE.getWindow_Browser().getTree()
+						.getLastSelectedPathComponent());
 	}
 
 	public Object open() {
@@ -75,8 +68,9 @@ public class AddPCDialog extends Dialog {
 
 		Label lblSystem = new Label(shell, SWT.WRAP);
 		lblSystem.setBounds(10, 10, 454, 20);
-		lblSystem.setText("Pridanie poèítaèa k systému: "
-				+ parentItem.getText());
+		lblSystem.setText("Pridanie poèítaèa k systému "
+				+ WindowFactory.INSTANCE.getWindow_Browser().getTree()
+						.getLastSelectedPathComponent());
 
 		Label lblPCName = new Label(shell, SWT.NONE);
 		lblPCName.setBounds(10, 36, 93, 13);
@@ -193,76 +187,7 @@ public class AddPCDialog extends Dialog {
 						connectionType = "RD";
 					if (btnNoConnection.isFocusControl())
 						connectionType = "ConnectionTypeNotDefinied";
-					Scanner sc = null;
-					Scanner scannerLine = null;
-					FileWriter fw = null;
-					File copyOfBookmarks = new File("newFileOfBookmars.txt");
-					try {
-						sc = new Scanner(fileOfBookmarks);
-						fw = new FileWriter(copyOfBookmarks);
-						while (sc.hasNextLine()) {
-							String line = sc.nextLine();
-							if (!line.equals(parentItem.getText())) {
-								fw.write(line + "\n");
-							} else {
-								fw.write(line + "\n");
-								String systemLines = sc.nextLine();
-								scannerLine = new Scanner(systemLines);
-								scannerLine.useDelimiter("\t");
-								// linka zapisana
-								while (!scannerLine.next().equals(
-										currentPC.getName())
-										&& !systemLines.equals("---")) {
-									fw.write(systemLines + "\n");
-									systemLines = sc.nextLine();
-									scannerLine = new Scanner(systemLines);
-									scannerLine.useDelimiter("\t");
-								}
-								fw.write(textPCName.getText().trim() + "\t"
-										+ connectionType + "\t"
-										+ textIPAdress.getText().trim() + "\n");
-							}
-						}
-						if (fw != null)
-							fw.close();
-						if (sc != null)
-							sc.close();
 
-						boolean deleted = false;
-						for (int i = 0; i < 20; i++) {
-							deleted = fileOfBookmarks.delete();
-							if (deleted)
-								break;
-							System.gc();
-							Thread.yield();
-						}
-						boolean renamed = false;
-						if (deleted) {
-							for (int i = 0; i < 20; i++) {
-								renamed = copyOfBookmarks
-										.renameTo(fileOfBookmarks);
-								if (renamed)
-									break;
-								System.gc();
-								Thread.yield();
-							}
-							if (!renamed) {
-								throw new IOException();
-							}
-						} else {
-							throw new IOException();
-						}
-					} catch (FileNotFoundException fnf) {
-						FileNotFoundDialog popUpFileNF = new FileNotFoundDialog(
-								shell, SWT.DIALOG_TRIM, fileOfBookmarks
-										.getAbsolutePath());
-						popUpFileNF.open();
-					} catch (IOException ioex) {
-						IOExceptionFileWriterErrorDialog popUpIO = new IOExceptionFileWriterErrorDialog(
-								shell, SWT.DIALOG_TRIM, copyOfBookmarks
-										.getAbsolutePath());
-						popUpIO.open();
-					}
 					shell.close();
 				}
 			});
@@ -283,66 +208,25 @@ public class AddPCDialog extends Dialog {
 						chybaVstupuPopUP.open();
 						return;
 					}
-					Scanner sc = null;
-					FileWriter fw = null;
-					File copyOfBookmarks = new File("newFileOfBookmars.txt");
+					PC newPC = new PC();
+					newPC.setConnectionType(connectionType);
+					newPC.setIp(textIPAdress.getText().trim());
+					newPC.setName(textPCName.getText().trim());
 					try {
-						sc = new Scanner(fileOfBookmarks);
-						fw = new FileWriter(copyOfBookmarks);
-						while (sc.hasNextLine()) {
-							String line = sc.nextLine();
-							if (!line.equals(parentItem.getText())) {
-								fw.write(line + "\n");
-							} else {
-								fw.write(line + "\n");
-								String systemLines = sc.nextLine();
-								while (!systemLines.equals("---")) {
-									fw.write(systemLines + "\n");
-									systemLines = sc.nextLine();
-								}
-								fw.write(textPCName.getText().trim() + "\t"
-										+ connectionType + "\t"
-										+ textIPAdress.getText().trim() + "\n");
-								fw.write("---");
-								if (sc.hasNextLine())
-									fw.write("\n");
-							}
-						}
-						if (fw != null)
-							fw.close();
-						if (sc != null)
-							sc.close();
-						boolean deleted = false;
-						for (int i = 0; i < 20; i++) {
-							deleted = fileOfBookmarks.delete();
-							if (deleted)
-								break;
-							System.gc();
-							Thread.yield();
-						}
-						boolean renamed = false;
-						if (deleted) {
-							for (int i = 0; i < 20; i++) {
-								renamed = copyOfBookmarks
-										.renameTo(fileOfBookmarks);
-								if (renamed)
-									break;
-								System.gc();
-								Thread.yield();
-							}
-
-						}
-					} catch (FileNotFoundException fnf) {
-						FileNotFoundDialog popUpFileNF = new FileNotFoundDialog(
-								shell, SWT.DIALOG_TRIM, fileOfBookmarks
-										.getAbsolutePath());
-						popUpFileNF.open();
-					} catch (IOException ioex) {
-						IOExceptionFileWriterErrorDialog popUpIO = new IOExceptionFileWriterErrorDialog(
-								shell, SWT.DIALOG_TRIM, copyOfBookmarks
-										.getAbsolutePath());
-						popUpIO.open();
+						DAOFactory.INSTANCE.getPCDAO().insertPC(
+								newPC,
+								((Bookmark) WindowFactory.INSTANCE
+										.getWindow_Browser().getTree()
+										.getLastSelectedPathComponent())
+										.getId());
+					} catch (FileNotFoundException e1) {
+						e1.printStackTrace();
 					}
+					ModelFactory.INSTANCE.getBookmarkTreeModel()
+							.nodeStructureChanged(
+									(TreeNode) WindowFactory.INSTANCE
+											.getWindow_Browser().getTree()
+											.getLastSelectedPathComponent());
 					shell.close();
 				}
 			});

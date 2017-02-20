@@ -2,28 +2,26 @@ package kybsysbrowser.dialog;
 
 import kybsysbrowser.dialog.exceptionSolving.InfoDialog;
 import kybsysbrowser.factory.DAOFactory;
-import kybsysbrowser.factory.WindowBrowserFactory;
-import kybsysbrowser.frame.MainFrame;
 
-import org.eclipse.swt.widgets.Dialog;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Dialog;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 
 public class SettingsDialog extends Dialog {
 
 	protected Object result;
 	protected Shell shell;
 	private Text textVNCPath;
+	private Text textBookmarksPath;
 	protected Shell parentShell;
-	private Text text;
 
 	/**
 	 * Create the dialog.
@@ -51,30 +49,13 @@ public class SettingsDialog extends Dialog {
 				parentBounds.y + parentBounds.height / 2 - shell.getSize().y
 						/ 2);
 
-		Label lblCestaPreSbor = new Label(shell, SWT.NONE);
-		lblCestaPreSbor.setBounds(10, 77, 183, 13);
-		lblCestaPreSbor
-				.setText("Cesta pre s\u00FAbor s polo\u017Ekami v strome:");
-
-		Button setBookmarksFilepatchButton = new Button(shell, SWT.NONE);
-		setBookmarksFilepatchButton.setText("Nastavenie vlastnej cesty");
-		setBookmarksFilepatchButton.setBounds(199, 72, 144, 23);
-
-		text = new Text(shell, SWT.BORDER);
-		text.setText("");
-		text.setEditable(false);
-		text.setBounds(10, 101, 424, 19);
+		Label lblPathForBookmarksFile = new Label(shell, SWT.NONE);
+		lblPathForBookmarksFile.setBounds(10, 77, 183, 13);
+		lblPathForBookmarksFile
+				.setText("Cesta pre s˙bor s poloûkami v strome:");
 
 		Label label = new Label(shell, SWT.SEPARATOR | SWT.HORIZONTAL);
-		label.setBounds(10, 126, 424, 2);
-
-		Button btnPredvolen = new Button(shell, SWT.RADIO);
-		btnPredvolen.setBounds(288, 8, 83, 16);
-		btnPredvolen.setText("Predvolen\u00E1");
-
-		Button button = new Button(shell, SWT.RADIO);
-		button.setText("Predvolen\u00E1");
-		button.setBounds(349, 75, 83, 16);
+		label.setBounds(10, 126, 333, 2);
 		shell.open();
 		shell.layout();
 		while (!shell.isDisposed()) {
@@ -90,7 +71,7 @@ public class SettingsDialog extends Dialog {
 	 */
 	private void createContents() {
 		shell = new Shell(getParent(), getStyle());
-		shell.setSize(450, 200);
+		shell.setSize(360, 200);
 		shell.setText(getText());
 
 		Label lblCestaPreAplikciu = new Label(shell, SWT.NONE);
@@ -103,27 +84,52 @@ public class SettingsDialog extends Dialog {
 			public void widgetSelected(SelectionEvent e) {
 				FileDialog fileDialog = new FileDialog(shell, SWT.DIALOG_TRIM);
 				fileDialog.open();
-				textVNCPath.setText(fileDialog.getFilterPath() + "\\"
-						+ fileDialog.getFileName());
+				String newPath = fileDialog.getFilterPath().replace("\\", "/")
+						+ "/" + fileDialog.getFileName().replace("\\", "/");
+				if (newPath.length() > 1)
+					textVNCPath.setText(newPath);
 			}
 		});
 		btnSetVNCPath.setText("Nastavenie vlastnej cesty");
-		btnSetVNCPath.setBounds(138, 5, 144, 23);
+		btnSetVNCPath.setBounds(199, 5, 144, 23);
+
+		Button setBookmarksFilepathButton = new Button(shell, SWT.NONE);
+		setBookmarksFilepathButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+				FileDialog fileDialog = new FileDialog(shell, SWT.DIALOG_TRIM);
+				fileDialog.open();
+				String newPath = fileDialog.getFilterPath().replace("\\", "/")
+						+ "/" + fileDialog.getFileName().replace("\\", "/");
+				if (newPath.length() > 1)
+					textBookmarksPath.setText(newPath);
+			}
+		});
+		setBookmarksFilepathButton.setText("Nastavenie vlastnej cesty");
+		setBookmarksFilepathButton.setBounds(199, 72, 144, 23);
 
 		textVNCPath = new Text(shell, SWT.BORDER);
-		textVNCPath.setBounds(10, 34, 424, 19);
+		textVNCPath.setBounds(10, 34, 333, 19);
 		textVNCPath.setText(DAOFactory.INSTANCE.getSettingDAO().getSetting(
 				"VNC path"));
 		textVNCPath.setEditable(false);
 
+		textBookmarksPath = new Text(shell, SWT.BORDER);
+		textBookmarksPath.setText((DAOFactory.INSTANCE.getSettingDAO()
+				.getSetting("File of bookmarks")));
+		textBookmarksPath.setEditable(false);
+		textBookmarksPath.setBounds(10, 101, 333, 19);
+
 		Button btnSaveChanges = new Button(shell, SWT.NONE);
-		btnSaveChanges.setBounds(228, 141, 100, 23);
+		btnSaveChanges.setBounds(137, 141, 100, 23);
 		btnSaveChanges.setText("Uloûiù zmeny");
 		btnSaveChanges.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				InfoDialog popUpOk = new InfoDialog(shell, SWT.DIALOG_TRIM,
 						"Zmeny uloûenÈ", "Zmeny uloûenÈ");
+				DAOFactory.INSTANCE.getSettingDAO().editSetting(
+						"File of bookmarks", textBookmarksPath.getText());
 				DAOFactory.INSTANCE.getSettingDAO().editSetting("VNC path",
 						textVNCPath.getText());
 				popUpOk.open();
@@ -139,10 +145,10 @@ public class SettingsDialog extends Dialog {
 			}
 		});
 		btnCancelChanges.setText("Zruöiù zmeny");
-		btnCancelChanges.setBounds(334, 141, 100, 23);
+		btnCancelChanges.setBounds(243, 141, 100, 23);
 
 		Label label = new Label(shell, SWT.SEPARATOR | SWT.HORIZONTAL);
-		label.setBounds(10, 64, 424, 2);
+		label.setBounds(10, 64, 333, 2);
 
 	}
 }

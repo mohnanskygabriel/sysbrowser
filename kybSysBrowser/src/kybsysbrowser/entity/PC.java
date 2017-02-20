@@ -7,6 +7,19 @@ import javax.swing.tree.TreeNode;
 import kybsysbrowser.factory.ModelFactory;
 
 public class PC implements TreeNode {
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PC other = (PC) obj;
+		if (id != other.id)
+			return false;
+		return true;
+	}
+
 	int id = hashCode();
 	String name = null;
 	public String connectionType = null;
@@ -21,7 +34,7 @@ public class PC implements TreeNode {
 
 	public PC() {
 	}
-	
+
 	public int getId() {
 		return id;
 	}

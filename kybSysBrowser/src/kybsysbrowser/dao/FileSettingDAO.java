@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -20,8 +22,8 @@ public class FileSettingDAO implements SettingDAO {
 	public void insertSetting(String name, String setting) {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		try {
-			FileWriter fileW = new FileWriter(settingsFile, true);
-			JsonWriter writer = gson.newJsonWriter(fileW);
+			JsonWriter writer = gson.newJsonWriter(new FileWriter(settingsFile,
+					true));
 			writer.beginObject();
 			writer.name(name);
 			writer.jsonValue("\"" + setting + "\"");
@@ -36,8 +38,7 @@ public class FileSettingDAO implements SettingDAO {
 	public String getSetting(String name) {
 		JsonReader jReader = null;
 		try {
-			FileReader reader = new FileReader(settingsFile);
-			jReader = new JsonReader(reader);
+			jReader = new JsonReader(new FileReader(settingsFile));
 			jReader.setLenient(true);
 			while (jReader.hasNext()) {
 				if (jReader.peek() == JsonToken.END_DOCUMENT) {
@@ -76,7 +77,40 @@ public class FileSettingDAO implements SettingDAO {
 
 	@Override
 	public void editSetting(String name, String newSetting) {
-		// TODO Auto-generated method stub
+		Map<String, String> settings = new HashMap<String, String>();
+		JsonReader jReader = null;
+		try {
+			jReader = new JsonReader(new FileReader(settingsFile));
+			jReader.setLenient(true);
+			while (jReader.hasNext()) {
+				if (jReader.peek() == JsonToken.END_DOCUMENT) {
+					jReader.close();
+					break;
+				}
+				jReader.beginObject();
+				settings.put(jReader.nextName(), jReader.nextString());
+				jReader.endObject();
+			}
+			Gson gson = new GsonBuilder().setPrettyPrinting().create();
+			JsonWriter jWriter = gson.newJsonWriter(new FileWriter(
+					settingsFile, false));
+			jWriter.setLenient(true);
+			for (String settingName : settings.keySet()) {
+				jWriter.beginObject();
+				jWriter.name(settingName);
+				if (settingName.equals(name)) {
+					jWriter.jsonValue("\"" + newSetting + "\"");
+				} else {
+					jWriter.jsonValue("\"" + settings.get(settingName) + "\"");
+				}
+				jWriter.endObject();
+			}
+			jWriter.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException ioEx) {
+			ioEx.printStackTrace();
+		}
 
 	}
 
