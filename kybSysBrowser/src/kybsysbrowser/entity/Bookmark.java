@@ -25,11 +25,20 @@ public class Bookmark implements TreeNode {
 	}
 
 	private int generateId() throws FileNotFoundException {
-		List<Bookmark> bookmarks = DAOFactory.INSTANCE.getBookmarkDao()
-				.getBookmarkAll();
+		int biggestID = 0;
+		List<Bookmark> bookmarks = DAOFactory.INSTANCE.getBookmarkDao().getBookmarkAll();
 		if (bookmarks.size() == 0)
 			return 0;
-		return bookmarks.get(bookmarks.size() - 1).getId() + 1;
+		for (Bookmark bookmark : bookmarks) {
+			if (bookmark.getId() > biggestID)
+				biggestID = bookmark.getId();
+			List<PC> computerList = bookmark.getComputerList();
+			for (PC pc : computerList) {
+				if (pc.getId() > biggestID)
+					biggestID = pc.getId();
+			}
+		}
+		return biggestID + 1;
 	}
 
 	public int getId() {
@@ -54,10 +63,6 @@ public class Bookmark implements TreeNode {
 
 	public LinkedList<PC> getComputerList() {
 		return computerList;
-	}
-
-	public void setComputerList(LinkedList<PC> computerList) {
-		this.computerList = computerList;
 	}
 
 	public void addPC(PC newPC) {
@@ -96,8 +101,7 @@ public class Bookmark implements TreeNode {
 
 	@Override
 	public TreeNode getParent() {
-		return (TreeNode) ModelFactory.INSTANCE.getBookmarkTreeModel()
-				.getRoot();
+		return (TreeNode) ModelFactory.INSTANCE.getBookmarkTreeModel().getRoot();
 	}
 
 	@Override

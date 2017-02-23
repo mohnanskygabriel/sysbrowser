@@ -1,5 +1,5 @@
 {
-  "File of bookmarks": "C:/Users/cta1926/workspace/git/kybSysBrowser/src/bookmarks.txt"
+  "File of bookmarks": "src/bookmarks.txt"
 }{
-  "VNC path": "C:/Users/cta1926/workspace/git/kybSysBrowser/src/vncviewer.v3.3.5.0.exe"
+  "VNC path": "src/vncviewer.v3.3.5.0.exe"
 }

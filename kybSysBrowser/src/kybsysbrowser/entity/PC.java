@@ -2,6 +2,7 @@ package kybsysbrowser.entity;
 
 import java.io.FileNotFoundException;
 import java.util.Enumeration;
+import java.util.List;
 
 import javax.swing.tree.TreeNode;
 
@@ -16,11 +17,25 @@ public class PC implements TreeNode {
 	private String connectionType = null;
 
 	public PC(String name, String ip, String connectionType) throws FileNotFoundException {
-		this.id = DAOFactory.INSTANCE.getPCDAO().getPCCount() + 1;
-		System.out.println(DAOFactory.INSTANCE.getPCDAO().getPCCount());
+		this.id = generateID();
 		this.name = name;
 		this.ip = ip;
 		this.connectionType = connectionType;
+	}
+
+	private int generateID() throws FileNotFoundException {
+		int biggestID = 0;
+		List<Bookmark> bookmarks = DAOFactory.INSTANCE.getBookmarkDao().getBookmarkAll();
+		for (Bookmark bookmark : bookmarks) {
+			if (bookmark.getId() > biggestID)
+				biggestID = bookmark.getId();
+			List<PC> computerList = bookmark.getComputerList();
+			for (PC pc : computerList) {
+				if (pc.getId() > biggestID)
+					biggestID = pc.getId();
+			}
+		}
+		return biggestID + 1;
 	}
 
 	public int getId() {
@@ -78,10 +93,8 @@ public class PC implements TreeNode {
 
 	@Override
 	public TreeNode getParent() {
-		while (((RootNode) ModelFactory.INSTANCE.getBookmarkTreeModel()
-				.getRoot()).children().hasMoreElements()) {
-			Bookmark bm = ((RootNode) ModelFactory.INSTANCE
-					.getBookmarkTreeModel().getRoot()).children().nextElement();
+		while (((RootNode) ModelFactory.INSTANCE.getBookmarkTreeModel().getRoot()).children().hasMoreElements()) {
+			Bookmark bm = ((RootNode) ModelFactory.INSTANCE.getBookmarkTreeModel().getRoot()).children().nextElement();
 			if (bm.getIndex(this) != -1) {
 				continue;
 			} else {
@@ -99,6 +112,48 @@ public class PC implements TreeNode {
 	@Override
 	public String toString() {
 		return name;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((connectionType == null) ? 0 : connectionType.hashCode());
+		result = prime * result + id;
+		result = prime * result + ((ip == null) ? 0 : ip.hashCode());
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PC other = (PC) obj;
+		if (id != other.id)
+			return false;
+		if (connectionType == null) {
+			if (other.connectionType != null)
+				return false;
+		} else if (!connectionType.equals(other.connectionType))
+			return false;
+		if (id != other.id)
+			return false;
+		if (ip == null) {
+			if (other.ip != null)
+				return false;
+		} else if (!ip.equals(other.ip))
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		return true;
 	}
 
 }

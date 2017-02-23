@@ -13,12 +13,6 @@ import javax.swing.JRootPane;
 import javax.swing.JTree;
 import javax.swing.tree.TreeNode;
 
-import kybsysbrowser.dialog.AddBookmarkDialog;
-import kybsysbrowser.dialog.AddPCDialog;
-import kybsysbrowser.dialog.DeleteItemFromTreeDialog;
-import kybsysbrowser.dialog.SettingsDialog;
-import kybsysbrowser.factory.ModelFactory;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.browser.Browser;
@@ -33,16 +27,21 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 
+import kybsysbrowser.dialog.AddBookmarkDialog;
+import kybsysbrowser.dialog.AddPCDialog;
+import kybsysbrowser.dialog.DeleteItemFromTreeDialog;
+import kybsysbrowser.dialog.SettingsDialog;
+import kybsysbrowser.factory.ModelFactory;
+
 public class MainFrame {
 
 	/*
-	 * TODO: urobit pridavanie a editaciu novych PC dorobit jedinecne id : pre
-	 * bookmark ok na pre pc stale nie je OK kedze pozera iba pc count a po
-	 * mazani nove pc dostane rovnake, treba zistit najvacsie id a dat o jedno
-	 * vacsie ako pri bookmark!!! pre entity kedze moze sa vygenerovat rovnaky
-	 * hash ako v subore uz nejaka entita ma po dalsom spusteni programu
-	 * vytvorit triedu ktora bude uchovavat vsetky riesenia exceptionov a na
-	 * riesenie exceptionov uz iba volat z tejto triedy dane riesenie vynimky
+	 * TODO: dorobit po zmene stromu:
+	 * ModelFactory.INSTANCE.getBookmarkTreeModel().nodesWereRemoved();
+	 * ModelFactory.INSTANCE.getBookmarkTreeModel().nodesWereInserted(); urobit
+	 * editaciu PC, vytvorit triedu ktora bude uchovavat vsetky riesenia
+	 * exceptionov a na riesenie exceptionov uz iba volat z tejto triedy dane
+	 * riesenie vynimky
 	 */
 
 	private JTree tree;
@@ -92,8 +91,7 @@ public class MainFrame {
 		settingButton.setText("Nastavenia programu");
 
 		Composite composite = new Composite(shell, SWT.EMBEDDED);
-		GridData gd_composite = new GridData(SWT.FILL, SWT.FILL, true, true, 1,
-				1);
+		GridData gd_composite = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
 		gd_composite.widthHint = 150;
 		composite.setLayoutData(gd_composite);
 		Frame frame = SWT_AWT.new_Frame(composite);
@@ -118,13 +116,9 @@ public class MainFrame {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				shell.setEnabled(false);
-				AddBookmarkDialog formAddBookmark = new AddBookmarkDialog(
-						shell, SWT.DIALOG_TRIM, false);
+				AddBookmarkDialog formAddBookmark = new AddBookmarkDialog(shell, SWT.DIALOG_TRIM, false);
 				formAddBookmark.open();
-				ModelFactory.INSTANCE.getBookmarkTreeModel()
-						.nodeStructureChanged(
-								(TreeNode) tree.getModel().getRoot());
-				;
+				ModelFactory.INSTANCE.getBookmarkTreeModel().reload();
 				shell.setEnabled(true);
 			}
 		});
@@ -133,10 +127,10 @@ public class MainFrame {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				shell.setEnabled(false);
-				AddPCDialog addPCDialog = new AddPCDialog(shell,
-						SWT.DIALOG_TRIM, false);
+				AddPCDialog addPCDialog = new AddPCDialog(shell, SWT.DIALOG_TRIM, false);
 				addPCDialog.open();
-				ModelFactory.INSTANCE.getBookmarkTreeModel().reload();
+				ModelFactory.INSTANCE.getBookmarkTreeModel()
+						.nodeStructureChanged((TreeNode) tree.getLastSelectedPathComponent());
 				shell.setEnabled(true);
 			}
 		});
@@ -165,14 +159,11 @@ public class MainFrame {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				shell.setEnabled(false);
-				DeleteItemFromTreeDialog deleteItemDialog = new DeleteItemFromTreeDialog(
-						shell, SWT.DIALOG_TRIM);
+				DeleteItemFromTreeDialog deleteItemDialog = new DeleteItemFromTreeDialog(shell, SWT.DIALOG_TRIM);
+				char[] treeState = getTreeExpansionState();
 				deleteItemDialog.open();
-				ModelFactory.INSTANCE
-						.getBookmarkTreeModel()
-						.nodeStructureChanged(
-								((TreeNode) tree.getLastSelectedPathComponent())
-										.getParent());
+				ModelFactory.INSTANCE.getBookmarkTreeModel().reload();
+				setTreeExpansionState(treeState);
 				shell.setEnabled(true);
 			}
 		});
@@ -229,8 +220,7 @@ public class MainFrame {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				shell.setEnabled(false);
-				SettingsDialog settingsWindow = new SettingsDialog(shell,
-						SWT.TITLE);
+				SettingsDialog settingsWindow = new SettingsDialog(shell, SWT.TITLE);
 				settingsWindow.open();
 				shell.setEnabled(true);
 			}
@@ -266,8 +256,7 @@ public class MainFrame {
 		try {
 
 			URLConnection con = url.openConnection();
-			BufferedReader in = new BufferedReader(new InputStreamReader(
-					con.getInputStream()));
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 			String l;
 			while ((l = in.readLine()) != null) {
 				htmlBuileder.append(l + "\n");
@@ -296,8 +285,7 @@ public class MainFrame {
 			Runtime r = Runtime.getRuntime();
 			Process p = r.exec(pingCmd);
 
-			BufferedReader in = new BufferedReader(new InputStreamReader(
-					p.getInputStream()));
+			BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			String inputLine;
 			while ((inputLine = in.readLine()) != null) {
 				pingResult += inputLine;
@@ -348,4 +336,30 @@ public class MainFrame {
 		return tree;
 	}
 
+	private char[] getTreeExpansionState() {
+		int rowCount = tree.getRowCount();
+		char[] treeState = new char[rowCount];
+		for (int i = 0; i < rowCount; i++) {
+			if (i == tree.getLeadSelectionRow()) {
+				treeState[i] = 'd';
+				continue;
+			}
+			if (tree.isExpanded(i))
+				treeState[i] = 'e';
+			else
+				treeState[i] = 'c';
+		}
+		return treeState;
+	}
+
+	private void setTreeExpansionState(char[] treeState) {
+		int row = 0;
+		for (int i = 0; i < treeState.length; i++) {
+			if (treeState[i] == 'd')
+				continue;
+			if (treeState[i] == 'e')
+				tree.expandRow(row);
+			row++;
+		}
+	}
 }
