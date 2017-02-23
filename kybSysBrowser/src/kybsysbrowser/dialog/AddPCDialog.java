@@ -208,10 +208,13 @@ public class AddPCDialog extends Dialog {
 						chybaVstupuPopUP.open();
 						return;
 					}
-					PC newPC = new PC();
-					newPC.setConnectionType(connectionType);
-					newPC.setIp(textIPAdress.getText().trim());
-					newPC.setName(textPCName.getText().trim());
+					PC newPC = null;
+					try {
+						newPC = new PC(textPCName.getText().trim(),
+								textIPAdress.getText().trim(), connectionType);
+					} catch (FileNotFoundException e2) {
+						e2.printStackTrace();
+					}
 					try {
 						DAOFactory.INSTANCE.getPCDAO().insertPC(
 								newPC,

@@ -15,4 +15,6 @@ public interface PCDAO {
 
 	public PC getAllPCOfBookmark(Bookmark bookmark);
 
+	public int getPCCount() throws FileNotFoundException;
+
 }

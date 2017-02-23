@@ -1,27 +1,35 @@
 package kybsysbrowser.entity;
 
+import java.io.FileNotFoundException;
 import java.util.Enumeration;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.tree.TreeNode;
 
+import kybsysbrowser.factory.DAOFactory;
 import kybsysbrowser.factory.ModelFactory;
 
 public class Bookmark implements TreeNode {
-	private int id = hashCode();
+	private int id = 0;
 	private String name = null;
 	private String url = null;
 	private LinkedList<PC> computerList = null;
 
-	public Bookmark(String name, String url) {
+	public Bookmark(String name, String url) throws FileNotFoundException {
+		this.id = generateId();
 		this.name = name;
 		this.url = url;
 		this.computerList = new LinkedList<PC>();
 	}
 
-	public Bookmark() {
-
+	private int generateId() throws FileNotFoundException {
+		List<Bookmark> bookmarks = DAOFactory.INSTANCE.getBookmarkDao()
+				.getBookmarkAll();
+		if (bookmarks.size() == 0)
+			return 0;
+		return bookmarks.get(bookmarks.size() - 1).getId() + 1;
 	}
 
 	public int getId() {
@@ -97,16 +105,4 @@ public class Bookmark implements TreeNode {
 		return false;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Bookmark other = (Bookmark) obj;
-		if (id != other.id)
-			return false;
-		return true;
-	}
-		
 }

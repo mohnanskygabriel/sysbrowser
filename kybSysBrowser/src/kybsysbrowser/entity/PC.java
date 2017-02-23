@@ -1,38 +1,26 @@
 package kybsysbrowser.entity;
 
+import java.io.FileNotFoundException;
 import java.util.Enumeration;
 
 import javax.swing.tree.TreeNode;
 
+import kybsysbrowser.factory.DAOFactory;
 import kybsysbrowser.factory.ModelFactory;
 
 public class PC implements TreeNode {
 
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		PC other = (PC) obj;
-		if (id != other.id)
-			return false;
-		return true;
-	}
+	private int id = 0;
+	private String name = null;
+	private String ip = null;
+	private String connectionType = null;
 
-	int id = hashCode();
-	String name = null;
-	public String connectionType = null;
-	public String ip = null;
-
-	public PC(String name, String ip, String connectionType, String userName,
-			String password) {
+	public PC(String name, String ip, String connectionType) throws FileNotFoundException {
+		this.id = DAOFactory.INSTANCE.getPCDAO().getPCCount() + 1;
+		System.out.println(DAOFactory.INSTANCE.getPCDAO().getPCCount());
 		this.name = name;
 		this.ip = ip;
 		this.connectionType = connectionType;
-	}
-
-	public PC() {
 	}
 
 	public int getId() {

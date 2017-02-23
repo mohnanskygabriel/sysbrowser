@@ -36,11 +36,13 @@ import org.eclipse.swt.widgets.Shell;
 public class MainFrame {
 
 	/*
-	 * TODO: urobit pridavanie a editaciu novych PC dorobit jedinecne id pre
-	 * entity kedze moze sa vygenerovat rovnaky hash ako v subore uz nejaka
-	 * entita ma po dalsom spusteni programu vytvorit triedu ktora bude
-	 * uchovavat vsetky riesenia exceptionov a na riesenie exceptionov uz iba
-	 * volat z tejto triedy dane riesenie vynimky
+	 * TODO: urobit pridavanie a editaciu novych PC dorobit jedinecne id : pre
+	 * bookmark ok na pre pc stale nie je OK kedze pozera iba pc count a po
+	 * mazani nove pc dostane rovnake, treba zistit najvacsie id a dat o jedno
+	 * vacsie ako pri bookmark!!! pre entity kedze moze sa vygenerovat rovnaky
+	 * hash ako v subore uz nejaka entita ma po dalsom spusteni programu
+	 * vytvorit triedu ktora bude uchovavat vsetky riesenia exceptionov a na
+	 * riesenie exceptionov uz iba volat z tejto triedy dane riesenie vynimky
 	 */
 
 	private JTree tree;

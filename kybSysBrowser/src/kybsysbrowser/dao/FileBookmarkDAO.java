@@ -66,23 +66,6 @@ public class FileBookmarkDAO implements BookmarkDAO {
 		}
 	}
 
-	private void deleteFileOfBookmarksAndCreateNew() {
-		boolean deleted = false;
-		for (int i = 0; i < 20; i++) {
-			deleted = getFileOfBookmarks().delete();
-			if (deleted)
-				break;
-			System.gc();
-			Thread.yield();
-		}
-		try {
-			getFileOfBookmarks().createNewFile();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-
 	@Override
 	public Bookmark getBookmark(Bookmark bookmark) throws FileNotFoundException {
 		if (getFileOfBookmarks().length() < 1) {
@@ -209,6 +192,23 @@ public class FileBookmarkDAO implements BookmarkDAO {
 	public File getFileOfBookmarks() {
 		return new File(DAOFactory.INSTANCE.getSettingDAO().getSetting(
 				"File of bookmarks"));
+	}
+	
+	private void deleteFileOfBookmarksAndCreateNew() {
+		boolean deleted = false;
+		for (int i = 0; i < 20; i++) {
+			deleted = getFileOfBookmarks().delete();
+			if (deleted)
+				break;
+			System.gc();
+			Thread.yield();
+		}
+		try {
+			getFileOfBookmarks().createNewFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 }
