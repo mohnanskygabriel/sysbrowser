@@ -11,7 +11,7 @@ public interface PCDAO {
 
 	public void deletePC(PC pc) throws FileNotFoundException;
 	
-	public void editPC(PC pcOld, PC pcNew);
+	public void editPC(PC pcNew) throws FileNotFoundException;
 
 	public PC getAllPCOfBookmark(Bookmark bookmark);
 

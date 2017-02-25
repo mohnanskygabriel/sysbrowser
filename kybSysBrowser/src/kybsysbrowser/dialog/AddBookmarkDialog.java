@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import kybsysbrowser.dialog.exceptionSolving.InputMissingDialog;
 import kybsysbrowser.entity.Bookmark;
 import kybsysbrowser.factory.DAOFactory;
+import kybsysbrowser.factory.WindowFactory;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -27,26 +28,21 @@ public class AddBookmarkDialog extends Dialog {
 	private Text inputUserURL;
 	private Button btnSave;
 	private boolean editMode;
-	private Bookmark currentBookmark;
 	private Button btnCancel;
 	private Label label;
-	private Shell parentShell;
 
 	public AddBookmarkDialog(Shell parent, int style, boolean editMode) {
 		super(parent, style);
 		setText("Pridanie novÈho systÈmu");
 		this.editMode = editMode;
-		this.parentShell = parent;
 	}
 
 	public Object open() {
 		createContents();
 		Display display = getParent().getDisplay();
-		Rectangle parentBounds = parentShell.getBounds();
-		shell.setLocation(
-				parentBounds.x + parentBounds.width / 2 - shell.getSize().x / 2,
-				parentBounds.y + parentBounds.height / 2 - shell.getSize().y
-						/ 2);
+		Rectangle parentBounds = getParent().getBounds();
+		shell.setLocation(parentBounds.x + parentBounds.width / 2 - shell.getSize().x / 2,
+				parentBounds.y + parentBounds.height / 2 - shell.getSize().y / 2);
 		shell.open();
 		shell.layout();
 
@@ -59,7 +55,7 @@ public class AddBookmarkDialog extends Dialog {
 	}
 
 	private void createContents() {
-		shell = new Shell(parentShell, SWT.DIALOG_TRIM);
+		shell = new Shell(getParent(), SWT.DIALOG_TRIM);
 		shell.setText("Pridanie novÈho systÈmu");
 		shell.setLayout(new RowLayout(SWT.HORIZONTAL));
 		shell.setSize(480, 122);
@@ -86,8 +82,12 @@ public class AddBookmarkDialog extends Dialog {
 		btnCancel.setLayoutData(new RowData(120, 20));
 		btnCancel.setText("Zruöiù");
 		if (editMode) {
-			inputUserBookmarkName.setText(currentBookmark.getName());
-			inputUserURL.setText(currentBookmark.getUrl());
+			inputUserBookmarkName.setText(
+					((Bookmark) WindowFactory.INSTANCE.getWindow_Browser().getTree().getLastSelectedPathComponent())
+							.getName());
+			inputUserURL.setText(
+					((Bookmark) WindowFactory.INSTANCE.getWindow_Browser().getTree().getLastSelectedPathComponent())
+							.getUrl());
 			btnSave.setText("Uloûiù zmeny");
 		} else {
 			btnSave.setText("Pridaù systÈm");
@@ -100,14 +100,15 @@ public class AddBookmarkDialog extends Dialog {
 				checkInput();
 				try {
 					if (!editMode)
-						DAOFactory.INSTANCE.getBookmarkDao().insertBookmark(
-								new Bookmark(inputUserBookmarkName.getText(),
-										inputUserURL.getText()));
-					else
-						DAOFactory.INSTANCE.getBookmarkDao().editBookmark(
-								new Bookmark(inputUserBookmarkName.getText(),
-										inputUserURL.getText()));
-
+						DAOFactory.INSTANCE.getBookmarkDao()
+								.insertBookmark(new Bookmark(inputUserBookmarkName.getText(), inputUserURL.getText()));
+					else {
+						Bookmark bm = (Bookmark) WindowFactory.INSTANCE.getWindow_Browser().getTree()
+								.getLastSelectedPathComponent();
+						bm.setName(inputUserBookmarkName.getText());
+						bm.setUrl(inputUserURL.getText());
+						DAOFactory.INSTANCE.getBookmarkDao().editBookmark(bm);
+					}
 				} catch (FileNotFoundException fnfEx) {
 					fnfEx.printStackTrace();
 				} finally {
@@ -133,8 +134,7 @@ public class AddBookmarkDialog extends Dialog {
 			}
 		}
 		if (missingInputs != null) {
-			InputMissingDialog popUpMissingInputs = new InputMissingDialog(
-					shell, SWT.DIALOG_TRIM, missingInputs);
+			InputMissingDialog popUpMissingInputs = new InputMissingDialog(shell, SWT.DIALOG_TRIM, missingInputs);
 			popUpMissingInputs.open();
 			return;
 		}

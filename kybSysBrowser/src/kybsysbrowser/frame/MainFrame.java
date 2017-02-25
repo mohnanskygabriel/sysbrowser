@@ -31,17 +31,18 @@ import kybsysbrowser.dialog.AddBookmarkDialog;
 import kybsysbrowser.dialog.AddPCDialog;
 import kybsysbrowser.dialog.DeleteItemFromTreeDialog;
 import kybsysbrowser.dialog.SettingsDialog;
+import kybsysbrowser.entity.PC;
 import kybsysbrowser.factory.ModelFactory;
 
 public class MainFrame {
 
 	/*
-	 * TODO: dorobit po zmene stromu:
+	 * TODO: po zmene stromu:
 	 * ModelFactory.INSTANCE.getBookmarkTreeModel().nodesWereRemoved();
-	 * ModelFactory.INSTANCE.getBookmarkTreeModel().nodesWereInserted(); urobit
-	 * editaciu PC, vytvorit triedu ktora bude uchovavat vsetky riesenia
-	 * exceptionov a na riesenie exceptionov uz iba volat z tejto triedy dane
-	 * riesenie vynimky
+	 * ModelFactory.INSTANCE.getBookmarkTreeModel().nodesWereInserted();
+	 * vytvorit triedu ktora bude uchovavat vsetky riesenia exceptionov a na
+	 * riesenie exceptionov uz iba volat z tejto triedy dane riesenie vynimky
+	 * vyriesit stranky ako TSP-KIS ktore bezia na starom IE iba squele
 	 */
 
 	private JTree tree;
@@ -134,27 +135,26 @@ public class MainFrame {
 				shell.setEnabled(true);
 			}
 		});
-		//
-		// editItemButton.addSelectionListener(new SelectionAdapter() {
-		// @Override
-		// public void widgetSelected(SelectionEvent event) {
-		// shell.setEnabled(false);
-		// if (pcFromTreeItem.containsKey(currentSelection)) {
-		// WindowAddPC addPCDialog = new WindowAddPC(addPCButton
-		// .getParent().getShell(), SWT.DIALOG_TRIM,
-		// currentSelection.getParentItem(), true,
-		// pcFromTreeItem.get(currentSelection));
-		// addPCDialog.open();
-		// } else {
-		// WindowAddBookmark formAddBookmark = new WindowAddBookmark(
-		// shell, SWT.DIALOG_TRIM, true);
-		// formAddBookmark.open();
-		// }
-		// shell.setEnabled(true);
-		// // refreshBookmarks();
-		// }
-		// });
-		//
+
+		editItemButton.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				shell.setEnabled(false);
+				char[] treeState = getTreeExpansionState();
+				if (tree.getLastSelectedPathComponent().getClass() == PC.class) {
+					AddPCDialog addPCDialog = new AddPCDialog(addPCButton.getParent().getShell(), SWT.DIALOG_TRIM,
+							true);
+					addPCDialog.open();
+				} else {
+					AddBookmarkDialog formAddBookmark = new AddBookmarkDialog(shell, SWT.DIALOG_TRIM, true);
+					formAddBookmark.open();
+				}
+				ModelFactory.INSTANCE.getBookmarkTreeModel().reload();
+				setTreeExpansionState(treeState);
+				shell.setEnabled(true);
+			}
+		});
+
 		deleteItemButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -297,36 +297,6 @@ public class MainFrame {
 		}
 		return pingResult;
 	}
-
-	/*
-	 * public void refreshVNCPath(String path) { Scanner sc = null; PrintWriter
-	 * pw = null; try { if (path.equals("")) { sc = new Scanner(fileOfVNCPath);
-	 * vncPath = sc.next(); } else { pw = new PrintWriter(fileOfVNCPath);
-	 * pw.write(path); vncPath = path; } } catch (FileNotFoundException fnfex) {
-	 * FileNotFoundDialog popupFileNotFound = new FileNotFoundDialog( shell,
-	 * SWT.DIALOG_TRIM, fileOfVNCPath.getAbsolutePath());
-	 * popupFileNotFound.open();
-	 * 
-	 * File newVNCPathFile = new File(fileOfVNCPath.getAbsolutePath()); File
-	 * srcFile = new File("src"); srcFile.mkdir();
-	 * 
-	 * try { newVNCPathFile.createNewFile(); } catch (IOException e1) {
-	 * e1.printStackTrace(); } } catch (Exception ex) { File newBookmarksFile =
-	 * new File(fileOfVNCPath.getAbsolutePath()); File srcFile = new
-	 * File("src"); srcFile.mkdir(); boolean deleted = false; for (int i = 0; i
-	 * < 20; i++) { deleted = fileOfVNCPath.delete(); if (deleted) break;
-	 * System.gc(); Thread.yield(); } boolean renamed = false; if (deleted) {
-	 * for (int i = 0; i < 20; i++) { renamed =
-	 * newBookmarksFile.renameTo(fileOfVNCPath); if (renamed) break;
-	 * System.gc(); Thread.yield(); } try { newBookmarksFile.createNewFile(); }
-	 * catch (IOException e) { InfoDialog popupFileProblemNeedExit = new
-	 * InfoDialog(shell, SWT.DIALOG_TRIM,
-	 * "Nepodarilo sa otvori nový súbor, po ukonèení programu vymaž súbor " +
-	 * fileOfVNCPath + " a reštartni program", "Problém so súborom");
-	 * popupFileProblemNeedExit.open(); System.gc(); Thread.yield();
-	 * System.exit(0); } } } finally { if (sc != null) sc.close(); if (pw !=
-	 * null) pw.close(); } }
-	 */
 
 	public Shell getShell() {
 		return shell;
