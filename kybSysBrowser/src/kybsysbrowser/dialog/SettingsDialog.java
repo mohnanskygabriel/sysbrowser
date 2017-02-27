@@ -14,6 +14,9 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormAttachment;
 
 public class SettingsDialog extends Dialog {
 
@@ -22,6 +25,12 @@ public class SettingsDialog extends Dialog {
 	private Text textVNCPath;
 	private Text textBookmarksPath;
 	protected Shell parentShell;
+	private Button btnSaveChanges;
+	private FormData fd_textBookmarksPath;
+	private Label lblCestaPreAplikciu;
+	private Label label_1;
+	private FormData fd_setBookmarksFilepathButton;
+	private FormData fd_btnSaveChanges;
 
 	/**
 	 * Create the dialog.
@@ -50,12 +59,22 @@ public class SettingsDialog extends Dialog {
 						/ 2);
 
 		Label lblPathForBookmarksFile = new Label(shell, SWT.NONE);
-		lblPathForBookmarksFile.setBounds(10, 77, 183, 13);
+		fd_setBookmarksFilepathButton.left = new FormAttachment(lblPathForBookmarksFile, 6);
+		fd_textBookmarksPath.top = new FormAttachment(0, 105);
+		FormData fd_lblPathForBookmarksFile = new FormData();
+		fd_lblPathForBookmarksFile.top = new FormAttachment(label_1, 9);
+		fd_lblPathForBookmarksFile.left = new FormAttachment(lblCestaPreAplikciu, 0, SWT.LEFT);
+		lblPathForBookmarksFile.setLayoutData(fd_lblPathForBookmarksFile);
 		lblPathForBookmarksFile
 				.setText("Cesta pre s˙bor s poloûkami v strome:");
 
 		Label label = new Label(shell, SWT.SEPARATOR | SWT.HORIZONTAL);
-		label.setBounds(10, 126, 333, 2);
+		fd_btnSaveChanges.top = new FormAttachment(label, 6);
+		FormData fd_label = new FormData();
+		fd_label.top = new FormAttachment(textBookmarksPath, 6);
+		fd_label.left = new FormAttachment(lblCestaPreAplikciu, 0, SWT.LEFT);
+		fd_label.right = new FormAttachment(0, 343);
+		label.setLayoutData(fd_label);
 		shell.open();
 		shell.layout();
 		while (!shell.isDisposed()) {
@@ -71,14 +90,22 @@ public class SettingsDialog extends Dialog {
 	 */
 	private void createContents() {
 		shell = new Shell(getParent(), getStyle());
-		shell.setSize(360, 200);
+		shell.setSize(359, 195);
 		shell.setText(getText());
+		shell.setLayout(new FormLayout());
 
-		Label lblCestaPreAplikciu = new Label(shell, SWT.NONE);
-		lblCestaPreAplikciu.setBounds(10, 10, 122, 13);
+		lblCestaPreAplikciu = new Label(shell, SWT.NONE);
+		FormData fd_lblCestaPreAplikciu = new FormData();
+		fd_lblCestaPreAplikciu.left = new FormAttachment(0, 10);
+		fd_lblCestaPreAplikciu.top = new FormAttachment(0, 10);
+		lblCestaPreAplikciu.setLayoutData(fd_lblCestaPreAplikciu);
 		lblCestaPreAplikciu.setText("Cesta pre aplik·ciu VNC:");
 
 		Button btnSetVNCPath = new Button(shell, SWT.NONE);
+		FormData fd_btnSetVNCPath = new FormData();
+		fd_btnSetVNCPath.top = new FormAttachment(lblCestaPreAplikciu, -5, SWT.TOP);
+		fd_btnSetVNCPath.left = new FormAttachment(lblCestaPreAplikciu, 6);
+		btnSetVNCPath.setLayoutData(fd_btnSetVNCPath);
 		btnSetVNCPath.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -91,9 +118,12 @@ public class SettingsDialog extends Dialog {
 			}
 		});
 		btnSetVNCPath.setText("Nastavenie vlastnej cesty");
-		btnSetVNCPath.setBounds(199, 5, 144, 23);
 
-		Button setBookmarksFilepathButton = new Button(shell, SWT.NONE);
+		Button setBookmarksFilepathButton = new Button(shell, SWT.CENTER);
+		fd_setBookmarksFilepathButton = new FormData();
+		fd_setBookmarksFilepathButton.bottom = new FormAttachment(73, -23);
+		fd_setBookmarksFilepathButton.right = new FormAttachment(100, -18);
+		setBookmarksFilepathButton.setLayoutData(fd_setBookmarksFilepathButton);
 		setBookmarksFilepathButton.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
@@ -106,22 +136,29 @@ public class SettingsDialog extends Dialog {
 			}
 		});
 		setBookmarksFilepathButton.setText("Nastavenie vlastnej cesty");
-		setBookmarksFilepathButton.setBounds(199, 72, 144, 23);
 
 		textVNCPath = new Text(shell, SWT.BORDER);
-		textVNCPath.setBounds(10, 34, 333, 19);
+		FormData fd_textVNCPath = new FormData();
+		fd_textVNCPath.top = new FormAttachment(btnSetVNCPath, 6);
+		fd_textVNCPath.left = new FormAttachment(lblCestaPreAplikciu, 0, SWT.LEFT);
+		textVNCPath.setLayoutData(fd_textVNCPath);
 		textVNCPath.setText(DAOFactory.INSTANCE.getSettingDAO().getSetting(
 				"VNC path"));
 		textVNCPath.setEditable(false);
 
 		textBookmarksPath = new Text(shell, SWT.BORDER);
+		fd_textBookmarksPath = new FormData();
+		fd_textBookmarksPath.right = new FormAttachment(textVNCPath, 0, SWT.RIGHT);
+		fd_textBookmarksPath.left = new FormAttachment(0, 10);
+		textBookmarksPath.setLayoutData(fd_textBookmarksPath);
 		textBookmarksPath.setText((DAOFactory.INSTANCE.getSettingDAO()
 				.getSetting("File of bookmarks")));
 		textBookmarksPath.setEditable(false);
-		textBookmarksPath.setBounds(10, 101, 333, 19);
 
-		Button btnSaveChanges = new Button(shell, SWT.NONE);
-		btnSaveChanges.setBounds(137, 141, 100, 23);
+		btnSaveChanges = new Button(shell, SWT.NONE);
+		fd_btnSaveChanges = new FormData();
+		fd_btnSaveChanges.left = new FormAttachment(lblCestaPreAplikciu, 0, SWT.LEFT);
+		btnSaveChanges.setLayoutData(fd_btnSaveChanges);
 		btnSaveChanges.setText("Uloûiù zmeny");
 		btnSaveChanges.addSelectionListener(new SelectionAdapter() {
 			@Override
@@ -138,6 +175,10 @@ public class SettingsDialog extends Dialog {
 		});
 
 		Button btnCancelChanges = new Button(shell, SWT.NONE);
+		FormData fd_btnCancelChanges = new FormData();
+		fd_btnCancelChanges.top = new FormAttachment(btnSaveChanges, 0, SWT.TOP);
+		fd_btnCancelChanges.left = new FormAttachment(btnSaveChanges, 6);
+		btnCancelChanges.setLayoutData(fd_btnCancelChanges);
 		btnCancelChanges.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -145,10 +186,15 @@ public class SettingsDialog extends Dialog {
 			}
 		});
 		btnCancelChanges.setText("Zruöiù zmeny");
-		btnCancelChanges.setBounds(243, 141, 100, 23);
 
-		Label label = new Label(shell, SWT.SEPARATOR | SWT.HORIZONTAL);
-		label.setBounds(10, 64, 333, 2);
+		label_1 = new Label(shell, SWT.SEPARATOR | SWT.HORIZONTAL);
+		fd_textVNCPath.right = new FormAttachment(label_1, 0, SWT.RIGHT);
+		fd_setBookmarksFilepathButton.top = new FormAttachment(label_1, 6);
+		FormData fd_label_1 = new FormData();
+		fd_label_1.top = new FormAttachment(textVNCPath, 17);
+		fd_label_1.left = new FormAttachment(lblCestaPreAplikciu, 0, SWT.LEFT);
+		fd_label_1.right = new FormAttachment(0, 343);
+		label_1.setLayoutData(fd_label_1);
 
 	}
 }

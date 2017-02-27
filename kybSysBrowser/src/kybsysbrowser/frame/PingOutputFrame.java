@@ -8,12 +8,14 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Shell;
 
 public class PingOutputFrame extends Dialog {
 
@@ -21,7 +23,9 @@ public class PingOutputFrame extends Dialog {
 	protected Shell shell;
 	private String ip;
 	private Label lblOutput;
-	private Text text;
+	private Label separator;
+	private Label lblOutput_1;
+	private FormData fd_separator;
 
 	/**
 	 * Create the dialog.
@@ -47,9 +51,6 @@ public class PingOutputFrame extends Dialog {
 		shell.setLocation(parentBounds.width / 2 - shell.getBounds().width / 2,
 				parentBounds.height / 2 - shell.getBounds().height / 2);
 
-		text = new Text(shell, SWT.BORDER);
-		text.setBounds(10, 10, 334, 117);
-
 		shell.open();
 		shell.layout();
 		pingCurrentSelection();
@@ -66,27 +67,44 @@ public class PingOutputFrame extends Dialog {
 	 */
 	private void createContents() {
 		shell = new Shell(getParent(), SWT.DIALOG_TRIM);
-		shell.setSize(360, 200);
-		final Label lblOutput = new Label(shell, SWT.RESIZE);
-		this.lblOutput = lblOutput;
-		lblOutput.setBounds(10, 10, 334, 117);
-		lblOutput.setText("");
+		shell.setSize(420, 211);
+		shell.setLayout(new FormLayout());
+		lblOutput_1 = new Label(shell, SWT.RESIZE);
+		FormData fd_lblOutput_1 = new FormData();
+		fd_lblOutput_1.top = new FormAttachment(0, 10);
+		fd_lblOutput_1.left = new FormAttachment(0, 10);
+		lblOutput_1.setLayoutData(fd_lblOutput_1);
+		this.lblOutput = lblOutput_1;
+		lblOutput_1.setText("");
 
-		Label separator = new Label(shell, SWT.SEPARATOR | SWT.HORIZONTAL);
-		separator.setBounds(14, 133, 330, 2);
+		separator = new Label(shell, SWT.SEPARATOR | SWT.HORIZONTAL);
+		fd_lblOutput_1.bottom = new FormAttachment(separator, -6);
+		fd_lblOutput_1.right = new FormAttachment(separator, 0, SWT.RIGHT);
+		fd_separator = new FormData();
+		fd_separator.left = new FormAttachment(0, 14);
+		fd_separator.right = new FormAttachment(100, -10);
+		fd_separator.bottom = new FormAttachment(0, 146);
+		fd_separator.top = new FormAttachment(0, 133);
+		separator.setLayoutData(fd_separator);
 
 		Button btnRestart = new Button(shell, SWT.CENTER);
-		btnRestart.setBounds(10, 141, 68, 23);
-		btnRestart.setText("Restart");
+		FormData fd_btnRestart = new FormData();
+		fd_btnRestart.left = new FormAttachment(0, 10);
+		btnRestart.setLayoutData(fd_btnRestart);
+		btnRestart.setText("Reötart");
 
 		Button btnStopAndExit = new Button(shell, SWT.CENTER);
-		btnStopAndExit.setBounds(210, 141, 134, 23);
-		btnStopAndExit.setText("Zastaviù a zatvoriù okno");
+		fd_btnRestart.top = new FormAttachment(btnStopAndExit, 0, SWT.TOP);
+		FormData fd_btnStopAndExit = new FormData();
+		fd_btnStopAndExit.left = new FormAttachment(btnRestart, 6);
+		fd_btnStopAndExit.top = new FormAttachment(separator, 6);
+		btnStopAndExit.setLayoutData(fd_btnStopAndExit);
+		btnStopAndExit.setText("Zatvoriù okno");
 
 		btnRestart.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				lblOutput.setText("");
+				lblOutput_1.setText("");
 				pingCurrentSelection();
 			}
 		});
@@ -111,7 +129,7 @@ public class PingOutputFrame extends Dialog {
 			String inputLine;
 			while ((inputLine = in.readLine()) != null) {
 				lblOutput.setText(lblOutput.getText() + inputLine + "\n");
-				// System.out.println(inputLine);
+				System.out.println(inputLine);
 			}
 			in.close();
 		} catch (IOException e) {

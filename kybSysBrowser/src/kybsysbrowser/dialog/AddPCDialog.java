@@ -21,6 +21,9 @@ import kybsysbrowser.entity.PC;
 import kybsysbrowser.factory.DAOFactory;
 import kybsysbrowser.factory.ModelFactory;
 import kybsysbrowser.factory.WindowFactory;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormAttachment;
 
 public class AddPCDialog extends Dialog {
 
@@ -58,42 +61,72 @@ public class AddPCDialog extends Dialog {
 
 	private void createContents() {
 		shell = new Shell(getParent(), getStyle());
-		shell.setSize(360, 180);
+		shell.setSize(360, 190);
 		shell.setText(getText());
+		shell.setLayout(new FormLayout());
 
 		Label lblSystem = new Label(shell, SWT.WRAP);
-		lblSystem.setBounds(10, 10, 454, 20);
+		FormData fd_lblSystem = new FormData();
+		fd_lblSystem.left = new FormAttachment(0, 10);
+		fd_lblSystem.top = new FormAttachment(0, 10);
+		lblSystem.setLayoutData(fd_lblSystem);
 		lblSystem.setText("Pridanie poËÌtaËa k systÈmu "
 				+ WindowFactory.INSTANCE.getWindow_Browser().getTree().getLastSelectedPathComponent());
 
 		Label lblPCName = new Label(shell, SWT.NONE);
-		lblPCName.setBounds(10, 36, 93, 13);
+		FormData fd_lblPCName = new FormData();
+		fd_lblPCName.left = new FormAttachment(lblSystem, 0, SWT.LEFT);
+		lblPCName.setLayoutData(fd_lblPCName);
 		lblPCName.setText("N·zov poËÌtaËa:");
 
 		textPCName = new Text(shell, SWT.BORDER);
-		textPCName.setBounds(137, 33, 205, 19);
+		fd_lblPCName.top = new FormAttachment(textPCName, 3, SWT.TOP);
+		FormData fd_textPCName = new FormData();
+		fd_textPCName.left = new FormAttachment(lblPCName, 22);
+		fd_textPCName.right = new FormAttachment(100, -10);
+		fd_textPCName.top = new FormAttachment(lblSystem, 6);
+		textPCName.setLayoutData(fd_textPCName);
 
 		Label lblIpAdress = new Label(shell, SWT.NONE);
-		lblIpAdress.setBounds(10, 61, 93, 13);
+		FormData fd_lblIpAdress = new FormData();
+		fd_lblIpAdress.left = new FormAttachment(lblSystem, 0, SWT.LEFT);
+		lblIpAdress.setLayoutData(fd_lblIpAdress);
 		lblIpAdress.setText("IP adresa poËÌtaËa:");
 
 		textIPAdress = new Text(shell, SWT.BORDER);
-		textIPAdress.setBounds(137, 58, 205, 19);
+		fd_lblIpAdress.top = new FormAttachment(textIPAdress, 3, SWT.TOP);
+		FormData fd_textIPAdress = new FormData();
+		fd_textIPAdress.top = new FormAttachment(textPCName, 6);
+		fd_textIPAdress.left = new FormAttachment(textPCName, 0, SWT.LEFT);
+		fd_textIPAdress.right = new FormAttachment(100, -10);
+		textIPAdress.setLayoutData(fd_textIPAdress);
 
 		Label lblConnectionType = new Label(shell, SWT.NONE);
-		lblConnectionType.setBounds(10, 85, 93, 13);
+		FormData fd_lblConnectionType = new FormData();
+		fd_lblConnectionType.left = new FormAttachment(lblSystem, 0, SWT.LEFT);
+		lblConnectionType.setLayoutData(fd_lblConnectionType);
 		lblConnectionType.setText("Typ pripojenia:");
 
 		final Button btnRemoteDesktop = new Button(shell, SWT.RADIO);
-		btnRemoteDesktop.setBounds(137, 83, 100, 16);
+		fd_lblConnectionType.top = new FormAttachment(btnRemoteDesktop, 2, SWT.TOP);
+		FormData fd_btnRemoteDesktop = new FormData();
+		fd_btnRemoteDesktop.top = new FormAttachment(textIPAdress, 6);
+		fd_btnRemoteDesktop.left = new FormAttachment(textPCName, 0, SWT.LEFT);
+		btnRemoteDesktop.setLayoutData(fd_btnRemoteDesktop);
 		btnRemoteDesktop.setText("Remote Desktop");
 
 		final Button btnVnc = new Button(shell, SWT.RADIO);
-		btnVnc.setBounds(243, 83, 40, 16);
+		FormData fd_btnVnc = new FormData();
+		fd_btnVnc.top = new FormAttachment(textIPAdress, 6);
+		fd_btnVnc.left = new FormAttachment(btnRemoteDesktop, 6);
+		btnVnc.setLayoutData(fd_btnVnc);
 		btnVnc.setText("VNC");
 
 		final Button btnNoConnection = new Button(shell, SWT.RADIO);
-		btnNoConnection.setBounds(289, 83, 53, 16);
+		FormData fd_btnNoConnection = new FormData();
+		fd_btnNoConnection.top = new FormAttachment(textIPAdress, 6);
+		fd_btnNoConnection.left = new FormAttachment(btnVnc, 6);
+		btnNoConnection.setLayoutData(fd_btnNoConnection);
 		btnNoConnection.setText("éiadne");
 
 		btnVnc.addSelectionListener(new SelectionAdapter() {
@@ -130,14 +163,25 @@ public class AddPCDialog extends Dialog {
 			btnNoConnection.setSelection(true);
 
 		Label label = new Label(shell, SWT.SEPARATOR | SWT.HORIZONTAL);
-		label.setBounds(10, 112, 327, 2);
+		FormData fd_label = new FormData();
+		fd_label.right = new FormAttachment(textPCName, 0, SWT.RIGHT);
+		fd_label.bottom = new FormAttachment(lblConnectionType, 19, SWT.BOTTOM);
+		fd_label.top = new FormAttachment(lblConnectionType, 6);
+		fd_label.left = new FormAttachment(lblSystem, 0, SWT.LEFT);
+		label.setLayoutData(fd_label);
 
 		Button btnAddPC = new Button(shell, SWT.NONE);
-		btnAddPC.setBounds(10, 121, 78, 23);
+		FormData fd_btnAddPC = new FormData();
+		fd_btnAddPC.top = new FormAttachment(label, 6);
+		fd_btnAddPC.left = new FormAttachment(lblSystem, 0, SWT.LEFT);
+		btnAddPC.setLayoutData(fd_btnAddPC);
 		btnAddPC.setText("Pridaù poËÌtaË");
 
 		Button btnCancel = new Button(shell, SWT.NONE);
-		btnCancel.setBounds(94, 121, 68, 23);
+		FormData fd_btnCancel = new FormData();
+		fd_btnCancel.top = new FormAttachment(label, 6);
+		fd_btnCancel.left = new FormAttachment(textPCName, 0, SWT.LEFT);
+		btnCancel.setLayoutData(fd_btnCancel);
 		btnCancel.setText("Zruöiù");
 		btnCancel.addSelectionListener(new SelectionAdapter() {
 			@Override

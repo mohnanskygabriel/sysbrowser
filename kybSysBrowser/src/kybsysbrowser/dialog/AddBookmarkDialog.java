@@ -11,14 +11,15 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.RowData;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormAttachment;
 
 public class AddBookmarkDialog extends Dialog {
 
@@ -57,29 +58,85 @@ public class AddBookmarkDialog extends Dialog {
 	private void createContents() {
 		shell = new Shell(getParent(), SWT.DIALOG_TRIM);
 		shell.setText("Pridanie novÈho systÈmu");
-		shell.setLayout(new RowLayout(SWT.HORIZONTAL));
-		shell.setSize(480, 122);
+		shell.setSize(500, 160);
+		shell.setLayout(new FormLayout());
 		Label lblNazovSystemu = new Label(shell, SWT.NONE);
-		lblNazovSystemu.setLayoutData(new RowData(SWT.DEFAULT, 16));
+		FormData fd_lblNazovSystemu = new FormData();
+		fd_lblNazovSystemu.right = new FormAttachment(0, 87);
+		fd_lblNazovSystemu.bottom = new FormAttachment(0, 26);
+		fd_lblNazovSystemu.left = new FormAttachment(0, 10);
+		fd_lblNazovSystemu.top = new FormAttachment(0, 10);
+		lblNazovSystemu.setLayoutData(fd_lblNazovSystemu);
 		lblNazovSystemu.setText("N·zov systÈmu:");
 		inputUserBookmarkName = new Text(shell, SWT.BORDER);
-		inputUserBookmarkName.setLayoutData(new RowData(260, SWT.DEFAULT));
+		FormData fd_inputUserBookmarkName = new FormData();
+		fd_inputUserBookmarkName.top = new FormAttachment(0, 7);
+		fd_inputUserBookmarkName.right = new FormAttachment(100, -9);
+		fd_inputUserBookmarkName.left = new FormAttachment(0, 93);
+		inputUserBookmarkName.setLayoutData(fd_inputUserBookmarkName);
 		Label lblOdkazNaWebstranku = new Label(shell, SWT.NONE);
+		FormData fd_lblOdkazNaWebstranku = new FormData();
+		fd_lblOdkazNaWebstranku.bottom = new FormAttachment(lblNazovSystemu, 19, SWT.BOTTOM);
+		fd_lblOdkazNaWebstranku.right = new FormAttachment(0, 181);
+		fd_lblOdkazNaWebstranku.top = new FormAttachment(lblNazovSystemu, 6);
+		fd_lblOdkazNaWebstranku.left = new FormAttachment(0, 10);
+		lblOdkazNaWebstranku.setLayoutData(fd_lblOdkazNaWebstranku);
 		lblOdkazNaWebstranku.setText("Odkaz na webstr·nku systÈmu:");
 		inputUserURL = new Text(shell, SWT.BORDER);
-		inputUserURL.setLayoutData(new RowData(450, SWT.DEFAULT));
+		FormData fd_inputUserURL = new FormData();
+		fd_inputUserURL.left = new FormAttachment(0, 10);
+		fd_inputUserURL.right = new FormAttachment(100, -9);
+		fd_inputUserURL.top = new FormAttachment(0, 51);
+		inputUserURL.setLayoutData(fd_inputUserURL);
 		label = new Label(shell, SWT.SEPARATOR | SWT.HORIZONTAL);
-		label.setLayoutData(new RowData(458, 3));
+		FormData fd_label = new FormData();
+		fd_label.bottom = new FormAttachment(inputUserURL, 9, SWT.BOTTOM);
+		fd_label.top = new FormAttachment(inputUserURL, 7);
+		fd_label.left = new FormAttachment(0, 10);
+		fd_label.right = new FormAttachment(100, -9);
+		label.setLayoutData(fd_label);
 		btnSave = new Button(shell, SWT.NONE);
-		btnSave.setLayoutData(new RowData(120, 20));
+		FormData fd_btnSave = new FormData();
+		fd_btnSave.top = new FormAttachment(label, 6);
+		fd_btnSave.right = new FormAttachment(lblOdkazNaWebstranku, 0, SWT.RIGHT);
+		fd_btnSave.left = new FormAttachment(lblNazovSystemu, 0, SWT.LEFT);
+		btnSave.setLayoutData(fd_btnSave);
+		
+				btnSave.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						checkInput();
+						try {
+							if (!editMode)
+								DAOFactory.INSTANCE.getBookmarkDao()
+										.insertBookmark(new Bookmark(inputUserBookmarkName.getText(), inputUserURL.getText()));
+							else {
+								Bookmark bm = (Bookmark) WindowFactory.INSTANCE.getWindow_Browser().getTree()
+										.getLastSelectedPathComponent();
+								bm.setName(inputUserBookmarkName.getText());
+								bm.setUrl(inputUserURL.getText());
+								DAOFactory.INSTANCE.getBookmarkDao().editBookmark(bm);
+							}
+						} catch (FileNotFoundException fnfEx) {
+							fnfEx.printStackTrace();
+						} finally {
+							shell.close();
+						}
+					}
+				});
 		btnCancel = new Button(shell, SWT.NONE);
+		fd_btnSave.bottom = new FormAttachment(btnCancel, 0, SWT.BOTTOM);
+		FormData fd_btnCancel = new FormData();
+		fd_btnCancel.right = new FormAttachment(100, -136);
+		fd_btnCancel.left = new FormAttachment(btnSave, 6);
+		fd_btnCancel.top = new FormAttachment(label, 6);
+		btnCancel.setLayoutData(fd_btnCancel);
 		btnCancel.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				shell.close();
 			}
 		});
-		btnCancel.setLayoutData(new RowData(120, 20));
 		btnCancel.setText("Zruöiù");
 		if (editMode) {
 			inputUserBookmarkName.setText(
@@ -93,29 +150,6 @@ public class AddBookmarkDialog extends Dialog {
 			btnSave.setText("Pridaù systÈm");
 			inputUserURL.setText("http://");
 		}
-
-		btnSave.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				checkInput();
-				try {
-					if (!editMode)
-						DAOFactory.INSTANCE.getBookmarkDao()
-								.insertBookmark(new Bookmark(inputUserBookmarkName.getText(), inputUserURL.getText()));
-					else {
-						Bookmark bm = (Bookmark) WindowFactory.INSTANCE.getWindow_Browser().getTree()
-								.getLastSelectedPathComponent();
-						bm.setName(inputUserBookmarkName.getText());
-						bm.setUrl(inputUserURL.getText());
-						DAOFactory.INSTANCE.getBookmarkDao().editBookmark(bm);
-					}
-				} catch (FileNotFoundException fnfEx) {
-					fnfEx.printStackTrace();
-				} finally {
-					shell.close();
-				}
-			}
-		});
 	}
 
 	private void checkInput() {
