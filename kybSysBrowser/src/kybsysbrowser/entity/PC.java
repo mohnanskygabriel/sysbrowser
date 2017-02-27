@@ -16,7 +16,8 @@ public class PC implements TreeNode {
 	private String ip = null;
 	private String connectionType = null;
 
-	public PC(String name, String ip, String connectionType) throws FileNotFoundException {
+	public PC(String name, String ip, String connectionType)
+			throws FileNotFoundException {
 		this.id = generateID();
 		this.name = name;
 		this.ip = ip;
@@ -25,7 +26,8 @@ public class PC implements TreeNode {
 
 	private int generateID() throws FileNotFoundException {
 		int biggestID = 0;
-		List<Bookmark> bookmarks = DAOFactory.INSTANCE.getBookmarkDao().getBookmarkAll();
+		List<Bookmark> bookmarks = DAOFactory.INSTANCE.getBookmarkDao()
+				.getBookmarkAll();
 		for (Bookmark bookmark : bookmarks) {
 			if (bookmark.getId() > biggestID)
 				biggestID = bookmark.getId();
@@ -93,9 +95,12 @@ public class PC implements TreeNode {
 
 	@Override
 	public TreeNode getParent() {
-		while (((RootNode) ModelFactory.INSTANCE.getBookmarkTreeModel().getRoot()).children().hasMoreElements()) {
-			Bookmark bm = ((RootNode) ModelFactory.INSTANCE.getBookmarkTreeModel().getRoot()).children().nextElement();
-			if (bm.getIndex(this) != -1) {
+		RootNode root = (RootNode) ModelFactory.INSTANCE.getBookmarkTreeModel()
+				.getRoot();
+		Enumeration<Bookmark> enumeration = root.children();
+		while (enumeration.hasMoreElements()) {
+			Bookmark bm = enumeration.nextElement();
+			if (!bm.getComputerList().contains(this)) {
 				continue;
 			} else {
 				return bm;
@@ -112,6 +117,28 @@ public class PC implements TreeNode {
 	@Override
 	public String toString() {
 		return name;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		PC other = (PC) obj;
+		if (id != other.id)
+			return false;
+		return true;
 	}
 
 }

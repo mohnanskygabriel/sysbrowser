@@ -13,8 +13,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.RowData;
-import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
@@ -49,20 +50,33 @@ public class DeleteItemFromTreeDialog extends Dialog {
 
 	private void createContents() {
 		shell = new Shell(getParent(), getStyle());
-		shell.setSize(300, 100);
+		shell.setSize(469, 109);
 		shell.setText(getText());
-		shell.setLayout(new RowLayout(SWT.HORIZONTAL));
-		Label lblMessage = new Label(shell, SWT.WRAP);
-		lblMessage.setLayoutData(new RowData(290, 30));
+		shell.setLayout(new FormLayout());
+		Label lblMessage = new Label(shell, SWT.WRAP | SWT.CENTER);
+		FormData fd_lblMessage = new FormData();
+		fd_lblMessage.right = new FormAttachment(0, 453);
+		fd_lblMessage.top = new FormAttachment(0, 10);
+		fd_lblMessage.left = new FormAttachment(0, 10);
+		lblMessage.setLayoutData(fd_lblMessage);
 		Label separator = new Label(shell, SWT.SEPARATOR | SWT.HORIZONTAL);
-		separator.setLayoutData(new RowData(290, 10));
+		FormData fd_separator = new FormData();
+		fd_separator.bottom = new FormAttachment(0, 44);
+		fd_separator.right = new FormAttachment(0, 453);
+		fd_separator.top = new FormAttachment(0, 29);
+		fd_separator.left = new FormAttachment(0, 10);
+		separator.setLayoutData(fd_separator);
 		Button yesButton = new Button(shell, SWT.PUSH);
-		yesButton.setLayoutData(new RowData(100, SWT.DEFAULT));
+		FormData fd_yesButton = new FormData();
+		fd_yesButton.top = new FormAttachment(0, 50);
+		fd_yesButton.left = new FormAttachment(0, 10);
+		yesButton.setLayoutData(fd_yesButton);
 		yesButton.setText("Áno");
-		Label label = new Label(shell, SWT.SEPARATOR | SWT.HORIZONTAL);
-		label.setLayoutData(new RowData(80, 10));
 		Button noButton = new Button(shell, SWT.PUSH);
-		noButton.setLayoutData(new RowData(100, SWT.DEFAULT));
+		FormData fd_noButton = new FormData();
+		fd_noButton.top = new FormAttachment(0, 50);
+		fd_noButton.left = new FormAttachment(0, 47);
+		noButton.setLayoutData(fd_noButton);
 		noButton.setText("Nie");
 
 		Object selectionInTree = WindowFactory.INSTANCE.getWindow_Browser()
