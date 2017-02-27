@@ -1,5 +1,0 @@
-{
-  "File of bookmarks": "src/bookmarks.txt"
-}{
-  "VNC path": "src/vncviewer.v3.3.5.0.exe"
-}

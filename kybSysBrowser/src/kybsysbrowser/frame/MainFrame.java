@@ -38,8 +38,6 @@ public class MainFrame {
 
 	/*
 	 * TODO: po zmene stromu:
-	 * ModelFactory.INSTANCE.getBookmarkTreeModel().nodesWereRemoved();
-	 * ModelFactory.INSTANCE.getBookmarkTreeModel().nodesWereInserted();
 	 * vytvorit triedu ktora bude uchovavat vsetky riesenia exceptionov a na
 	 * riesenie exceptionov uz iba volat z tejto triedy dane riesenie vynimky
 	 * vyriesit stranky ako TSP-KIS ktore bezia na starom IE iba squele
