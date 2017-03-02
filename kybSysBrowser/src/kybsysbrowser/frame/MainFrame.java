@@ -3,17 +3,16 @@ package kybsysbrowser.frame;
 import java.awt.BorderLayout;
 import java.awt.Desktop;
 import java.awt.Frame;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLConnection;
 
 import javax.swing.DebugGraphics;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeNode;
 
 import kybsysbrowser.dialog.AddBookmarkDialog;
@@ -33,6 +32,7 @@ import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.browser.ProgressListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -40,24 +40,12 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Label;
 
 public class MainFrame {
-
-	/*
-<<<<<<< HEAD
-	 * TODO: po zmene stromu:
-	 * vytvorit triedu ktora bude uchovavat vsetky riesenia exceptionov a na
-	 * riesenie exceptionov uz iba volat z tejto triedy dane riesenie vynimky
-=======
-	 * TODO: vytvorit triedu ktora bude uchovavat vsetky riesenia exceptionov a
-	 * na riesenie exceptionov uz iba volat z tejto triedy dane riesenie vynimky
->>>>>>> branch 'master' of https://github.com/mohnanskygabriel/sysbrowser.git
-	 * vyriesit stranky ako TSP-KIS ktore bezia na starom IE iba squele
-	 */
 
 	private JTree tree;
 	private Browser browser;
@@ -76,7 +64,8 @@ public class MainFrame {
 				parentBounds.height / 2 - shell.getBounds().height / 2);
 		shell.setText("KybSys browser");
 		shell.setLayout(new FormLayout());
-
+		Image shellIcon = new Image(display, "src/open.png");
+		shell.setImage(shellIcon);
 		Menu menu = new Menu(shell, SWT.BAR);
 		shell.setMenuBar(menu);
 
@@ -118,6 +107,15 @@ public class MainFrame {
 		frame.add(tree, BorderLayout.CENTER);
 		tree.setAutoscrolls(true);
 		tree.setRootVisible(false);
+		Icon leafIcon = new ImageIcon("src/leaf.png");
+		Icon openIcon = new ImageIcon("src/open.png");
+		Icon closedIcon = new ImageIcon("src/closed.png");
+
+		DefaultTreeCellRenderer cellRenderer = (DefaultTreeCellRenderer) tree
+				.getCellRenderer();
+		cellRenderer.setLeafIcon(leafIcon);
+		cellRenderer.setOpenIcon(openIcon);
+		cellRenderer.setClosedIcon(closedIcon);
 
 		JScrollPane scrollPane = new JScrollPane(tree);
 		scrollPane.setDebugGraphicsOptions(DebugGraphics.BUFFERED_OPTION);
@@ -132,7 +130,6 @@ public class MainFrame {
 		fd_browser.right = new FormAttachment(100, -10);
 		fd_browser.left = new FormAttachment(composite, 6);
 		browser.setLayoutData(fd_browser);
-		
 
 		Button backButton = new Button(shell, SWT.NONE);
 		fd_browser.top = new FormAttachment(0, 29);
@@ -166,7 +163,6 @@ public class MainFrame {
 						if (url != null)
 							desktop.browse(new URI(url));
 					} catch (IOException | URISyntaxException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -226,21 +222,36 @@ public class MainFrame {
 						public void run() {
 							// refresh browser if is bookmark selected & new url
 							// is not part of selected bookmark url
-							if (tree.getLastSelectedPathComponent() != null
-									&& tree.getLastSelectedPathComponent()
-											.getClass() == Bookmark.class
-									&& browser
-											.getUrl()
-											.indexOf(
-													((Bookmark) tree
-															.getLastSelectedPathComponent())
-															.getUrl()) == -1) {
-								browserStatus.setText("Naèítávam...");
-								browser.setUrl(((Bookmark) tree
-										.getLastSelectedPathComponent())
-										.getUrl());
-							}
+							if (tree.getLastSelectedPathComponent() != null) {
+								if (tree.getLastSelectedPathComponent()
+										.getClass() == Bookmark.class
+										&& browser
+												.getUrl()
+												.indexOf(
+														((Bookmark) tree
+																.getLastSelectedPathComponent())
+																.getUrl()) == -1) {
+									browserStatus.setText("Naèítávam...");
+									browser.setUrl(((Bookmark) tree
+											.getLastSelectedPathComponent())
+											.getUrl());
+								} else if (tree.getLastSelectedPathComponent()
+										.getClass() == PC.class
+										&& browser
+												.getUrl()
+												.indexOf(
+														((Bookmark) ((TreeNode) tree
+																.getLastSelectedPathComponent())
+																.getParent())
+																.getUrl()) == -1) {
+									browserStatus.setText("Naèítávam...");
+									browser.setUrl(((Bookmark) ((TreeNode) tree
+											.getLastSelectedPathComponent())
+											.getParent()).getUrl());
 
+								}
+
+							}
 						}
 					});
 				}
@@ -427,55 +438,6 @@ public class MainFrame {
 			}
 
 		}
-	}
-
-	private void setSpecialTable(Browser browser, URL url) {
-		StringBuilder htmlBuileder = new StringBuilder();
-		try {
-
-			URLConnection con = url.openConnection();
-			BufferedReader in = new BufferedReader(new InputStreamReader(
-					con.getInputStream()));
-			String l;
-			while ((l = in.readLine()) != null) {
-				htmlBuileder.append(l + "\n");
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		String html = htmlBuileder.toString();
-		int beginningOfTable = html.indexOf("div_datagrid");
-		int endOfTable = html.indexOf("dg_pager");
-		if (beginningOfTable < 0 && endOfTable < 0)
-			return;
-		StringBuilder sb = new StringBuilder();
-		sb.append("<html>");
-		sb.append("<body>");
-		sb.append(html.substring(beginningOfTable - 9, endOfTable + 103));
-		sb.append("</body>");
-		sb.append("</html>");
-		browser.setText(sb.toString());
-	}
-
-	String ping(String ip) {
-		String pingResult = "";
-		String pingCmd = "ping " + ip;
-		try {
-			Runtime r = Runtime.getRuntime();
-			Process p = r.exec(pingCmd);
-
-			BufferedReader in = new BufferedReader(new InputStreamReader(
-					p.getInputStream()));
-			String inputLine;
-			while ((inputLine = in.readLine()) != null) {
-				pingResult += inputLine;
-				pingResult += "\n";
-			}
-			in.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return pingResult;
 	}
 
 	public Shell getShell() {
