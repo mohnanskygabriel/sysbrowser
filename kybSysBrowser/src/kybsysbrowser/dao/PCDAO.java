@@ -8,7 +8,7 @@ public interface PCDAO {
 	public void insertPC(PC pc, int parentId);
 
 	public void deletePC(PC pc);
-	
+
 	public void editPC(PC pcNew);
 
 	public PC getAllPCOfBookmark(Bookmark bookmark);

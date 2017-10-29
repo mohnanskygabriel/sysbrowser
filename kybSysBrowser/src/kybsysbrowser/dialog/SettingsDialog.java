@@ -53,10 +53,8 @@ public class SettingsDialog extends Dialog {
 		createContents();
 		Display display = getParent().getDisplay();
 		Rectangle parentBounds = parentShell.getBounds();
-		shell.setLocation(
-				parentBounds.x + parentBounds.width / 2 - shell.getSize().x / 2,
-				parentBounds.y + parentBounds.height / 2 - shell.getSize().y
-						/ 2);
+		shell.setLocation(parentBounds.x + parentBounds.width / 2 - shell.getSize().x / 2,
+				parentBounds.y + parentBounds.height / 2 - shell.getSize().y / 2);
 
 		Label lblPathForBookmarksFile = new Label(shell, SWT.NONE);
 		fd_setBookmarksFilepathButton.left = new FormAttachment(lblPathForBookmarksFile, 6);
@@ -65,8 +63,7 @@ public class SettingsDialog extends Dialog {
 		fd_lblPathForBookmarksFile.top = new FormAttachment(label_1, 9);
 		fd_lblPathForBookmarksFile.left = new FormAttachment(lblCestaPreAplikciu, 0, SWT.LEFT);
 		lblPathForBookmarksFile.setLayoutData(fd_lblPathForBookmarksFile);
-		lblPathForBookmarksFile
-				.setText("Cesta pre súbor s položkami v strome:");
+		lblPathForBookmarksFile.setText("Cesta pre súbor s položkami v strome:");
 
 		Label label = new Label(shell, SWT.SEPARATOR | SWT.HORIZONTAL);
 		fd_btnSaveChanges.top = new FormAttachment(label, 6);
@@ -111,8 +108,8 @@ public class SettingsDialog extends Dialog {
 			public void widgetSelected(SelectionEvent e) {
 				FileDialog fileDialog = new FileDialog(shell, SWT.DIALOG_TRIM);
 				fileDialog.open();
-				String newPath = fileDialog.getFilterPath().replace("\\", "/")
-						+ "/" + fileDialog.getFileName().replace("\\", "/");
+				String newPath = fileDialog.getFilterPath().replace("\\", "/") + "/"
+						+ fileDialog.getFileName().replace("\\", "/");
 				if (newPath.length() > 1)
 					textVNCPath.setText(newPath);
 			}
@@ -129,8 +126,8 @@ public class SettingsDialog extends Dialog {
 			public void widgetSelected(SelectionEvent arg0) {
 				FileDialog fileDialog = new FileDialog(shell, SWT.DIALOG_TRIM);
 				fileDialog.open();
-				String newPath = fileDialog.getFilterPath().replace("\\", "/")
-						+ "/" + fileDialog.getFileName().replace("\\", "/");
+				String newPath = fileDialog.getFilterPath().replace("\\", "/") + "/"
+						+ fileDialog.getFileName().replace("\\", "/");
 				if (newPath.length() > 1)
 					textBookmarksPath.setText(newPath);
 			}
@@ -142,8 +139,7 @@ public class SettingsDialog extends Dialog {
 		fd_textVNCPath.top = new FormAttachment(btnSetVNCPath, 6);
 		fd_textVNCPath.left = new FormAttachment(lblCestaPreAplikciu, 0, SWT.LEFT);
 		textVNCPath.setLayoutData(fd_textVNCPath);
-		textVNCPath.setText(DAOFactory.INSTANCE.getSettingDAO().getSetting(
-				"VNC path"));
+		textVNCPath.setText(DAOFactory.INSTANCE.getSettingDAO().getSetting("VNC path"));
 		textVNCPath.setEditable(false);
 
 		textBookmarksPath = new Text(shell, SWT.BORDER);
@@ -151,8 +147,7 @@ public class SettingsDialog extends Dialog {
 		fd_textBookmarksPath.right = new FormAttachment(textVNCPath, 0, SWT.RIGHT);
 		fd_textBookmarksPath.left = new FormAttachment(0, 10);
 		textBookmarksPath.setLayoutData(fd_textBookmarksPath);
-		textBookmarksPath.setText((DAOFactory.INSTANCE.getSettingDAO()
-				.getSetting("File of bookmarks")));
+		textBookmarksPath.setText((DAOFactory.INSTANCE.getSettingDAO().getSetting("File of bookmarks")));
 		textBookmarksPath.setEditable(false);
 
 		btnSaveChanges = new Button(shell, SWT.NONE);
@@ -163,12 +158,9 @@ public class SettingsDialog extends Dialog {
 		btnSaveChanges.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
-				InfoDialog popUpOk = new InfoDialog(shell, SWT.DIALOG_TRIM,
-						"Zmeny uložené", "Zmeny uložené");
-				DAOFactory.INSTANCE.getSettingDAO().editSetting(
-						"File of bookmarks", textBookmarksPath.getText());
-				DAOFactory.INSTANCE.getSettingDAO().editSetting("VNC path",
-						textVNCPath.getText());
+				InfoDialog popUpOk = new InfoDialog(shell, SWT.DIALOG_TRIM, "Zmeny uložené", "Zmeny uložené");
+				DAOFactory.INSTANCE.getSettingDAO().editSetting("File of bookmarks", textBookmarksPath.getText());
+				DAOFactory.INSTANCE.getSettingDAO().editSetting("VNC path", textVNCPath.getText());
 				popUpOk.open();
 				shell.close();
 			}

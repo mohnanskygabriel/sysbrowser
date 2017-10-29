@@ -111,8 +111,7 @@ public class MainFrame {
 		Icon openIcon = new ImageIcon("src/open.png");
 		Icon closedIcon = new ImageIcon("src/closed.png");
 
-		DefaultTreeCellRenderer cellRenderer = (DefaultTreeCellRenderer) tree
-				.getCellRenderer();
+		DefaultTreeCellRenderer cellRenderer = (DefaultTreeCellRenderer) tree.getCellRenderer();
 		cellRenderer.setLeafIcon(leafIcon);
 		cellRenderer.setOpenIcon(openIcon);
 		cellRenderer.setClosedIcon(closedIcon);
@@ -150,12 +149,9 @@ public class MainFrame {
 			public void widgetSelected(SelectionEvent arg0) {
 				String url = null;
 				if (tree.getLastSelectedPathComponent().getClass() == Bookmark.class)
-					url = ((Bookmark) tree.getLastSelectedPathComponent())
-							.getUrl();
+					url = ((Bookmark) tree.getLastSelectedPathComponent()).getUrl();
 				else
-					url = ((Bookmark) ((TreeNode) tree
-							.getLastSelectedPathComponent()).getParent())
-							.getUrl();
+					url = ((Bookmark) ((TreeNode) tree.getLastSelectedPathComponent()).getParent()).getUrl();
 
 				if (Desktop.isDesktopSupported()) {
 					Desktop desktop = Desktop.getDesktop();
@@ -223,31 +219,17 @@ public class MainFrame {
 							// refresh browser if is bookmark selected & new url
 							// is not part of selected bookmark url
 							if (tree.getLastSelectedPathComponent() != null) {
-								if (tree.getLastSelectedPathComponent()
-										.getClass() == Bookmark.class
-										&& browser
-												.getUrl()
-												.indexOf(
-														((Bookmark) tree
-																.getLastSelectedPathComponent())
-																.getUrl()) == -1) {
+								if (tree.getLastSelectedPathComponent().getClass() == Bookmark.class && browser.getUrl()
+										.indexOf(((Bookmark) tree.getLastSelectedPathComponent()).getUrl()) == -1) {
 									browserStatus.setText("NaËÌt·vam...");
-									browser.setUrl(((Bookmark) tree
-											.getLastSelectedPathComponent())
-											.getUrl());
-								} else if (tree.getLastSelectedPathComponent()
-										.getClass() == PC.class
-										&& browser
-												.getUrl()
-												.indexOf(
-														((Bookmark) ((TreeNode) tree
-																.getLastSelectedPathComponent())
-																.getParent())
-																.getUrl()) == -1) {
+									browser.setUrl(((Bookmark) tree.getLastSelectedPathComponent()).getUrl());
+								} else if (tree.getLastSelectedPathComponent().getClass() == PC.class && browser
+										.getUrl().indexOf(((Bookmark) ((TreeNode) tree.getLastSelectedPathComponent())
+												.getParent()).getUrl()) == -1) {
 									browserStatus.setText("NaËÌt·vam...");
-									browser.setUrl(((Bookmark) ((TreeNode) tree
-											.getLastSelectedPathComponent())
-											.getParent()).getUrl());
+									browser.setUrl(
+											((Bookmark) ((TreeNode) tree.getLastSelectedPathComponent()).getParent())
+													.getUrl());
 
 								}
 
@@ -276,8 +258,7 @@ public class MainFrame {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				shell.setEnabled(false);
-				AddBookmarkDialog formAddBookmark = new AddBookmarkDialog(
-						shell, SWT.DIALOG_TRIM, false);
+				AddBookmarkDialog formAddBookmark = new AddBookmarkDialog(shell, SWT.DIALOG_TRIM, false);
 				formAddBookmark.open();
 				ModelFactory.INSTANCE.getBookmarkTreeModel().reload();
 				shell.setEnabled(true);
@@ -288,12 +269,10 @@ public class MainFrame {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				shell.setEnabled(false);
-				AddPCDialog addPCDialog = new AddPCDialog(shell,
-						SWT.DIALOG_TRIM, false);
+				AddPCDialog addPCDialog = new AddPCDialog(shell, SWT.DIALOG_TRIM, false);
 				addPCDialog.open();
 				ModelFactory.INSTANCE.getBookmarkTreeModel()
-						.nodeStructureChanged(
-								(TreeNode) tree.getLastSelectedPathComponent());
+						.nodeStructureChanged((TreeNode) tree.getLastSelectedPathComponent());
 				shell.setEnabled(true);
 			}
 		});
@@ -304,12 +283,11 @@ public class MainFrame {
 				shell.setEnabled(false);
 				char[] treeState = getTreeExpansionState();
 				if (tree.getLastSelectedPathComponent().getClass() == PC.class) {
-					AddPCDialog addPCDialog = new AddPCDialog(addPCButton
-							.getParent().getShell(), SWT.DIALOG_TRIM, true);
+					AddPCDialog addPCDialog = new AddPCDialog(addPCButton.getParent().getShell(), SWT.DIALOG_TRIM,
+							true);
 					addPCDialog.open();
 				} else {
-					AddBookmarkDialog formAddBookmark = new AddBookmarkDialog(
-							shell, SWT.DIALOG_TRIM, true);
+					AddBookmarkDialog formAddBookmark = new AddBookmarkDialog(shell, SWT.DIALOG_TRIM, true);
 					formAddBookmark.open();
 				}
 				ModelFactory.INSTANCE.getBookmarkTreeModel().reload();
@@ -322,8 +300,7 @@ public class MainFrame {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				shell.setEnabled(false);
-				DeleteItemFromTreeDialog deleteItemDialog = new DeleteItemFromTreeDialog(
-						shell, SWT.DIALOG_TRIM);
+				DeleteItemFromTreeDialog deleteItemDialog = new DeleteItemFromTreeDialog(shell, SWT.DIALOG_TRIM);
 				char[] treeState = getTreeExpansionState();
 				deleteItemDialog.open();
 				ModelFactory.INSTANCE.getBookmarkTreeModel().reload();
@@ -337,9 +314,8 @@ public class MainFrame {
 			public void widgetSelected(SelectionEvent e) {
 				// System.out.println(ping(pcFromTreeItem.get(currentSelection).ip));
 				shell.setEnabled(false);
-				PingOutputFrame popUpSelectPingType = new PingOutputFrame(
-						shell, SWT.DIALOG_TRIM, ((PC) tree
-								.getLastSelectedPathComponent()).getIp());
+				PingOutputFrame popUpSelectPingType = new PingOutputFrame(shell, SWT.DIALOG_TRIM,
+						((PC) tree.getLastSelectedPathComponent()).getIp());
 				popUpSelectPingType.open();
 				shell.setEnabled(true);
 			}
@@ -349,17 +325,11 @@ public class MainFrame {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				try {
-					String[] cmd = {
-							"cmd",
-							"/c",
-							"%windir%/system32/mstsc.exe /v:"
-									+ ((PC) tree.getLastSelectedPathComponent())
-											.getIp() + " /admin" };
+					String[] cmd = { "cmd", "/c", "%windir%/system32/mstsc.exe /v:"
+							+ ((PC) tree.getLastSelectedPathComponent()).getIp() + " /admin" };
 					Runtime.getRuntime().exec(cmd);
 				} catch (IOException e) {
-					new InfoDialog(shell, SWT.DIALOG_TRIM,
-							"Nepodarilo sa spustiù Remote Desktop", "Chyba")
-							.open();
+					new InfoDialog(shell, SWT.DIALOG_TRIM, "Nepodarilo sa spustiù Remote Desktop", "Chyba").open();
 				}
 			}
 		});
@@ -368,15 +338,10 @@ public class MainFrame {
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
 				try {
-					Runtime.getRuntime()
-							.exec(DAOFactory.INSTANCE.getSettingDAO()
-									.getSetting("VNC path")
-									+ " "
-									+ ((PC) tree.getLastSelectedPathComponent())
-											.getIp());
+					Runtime.getRuntime().exec(DAOFactory.INSTANCE.getSettingDAO().getSetting("VNC path") + " "
+							+ ((PC) tree.getLastSelectedPathComponent()).getIp());
 				} catch (IOException e) {
-					new InfoDialog(shell, SWT.DIALOG_TRIM,
-							"Nepodarilo sa spustiù VNC", "Chyba").open();
+					new InfoDialog(shell, SWT.DIALOG_TRIM, "Nepodarilo sa spustiù VNC", "Chyba").open();
 				}
 			}
 		});
@@ -385,8 +350,7 @@ public class MainFrame {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
 				shell.setEnabled(false);
-				SettingsDialog settingsWindow = new SettingsDialog(shell,
-						SWT.TITLE);
+				SettingsDialog settingsWindow = new SettingsDialog(shell, SWT.TITLE);
 				settingsWindow.open();
 				shell.setEnabled(true);
 			}
@@ -411,13 +375,11 @@ public class MainFrame {
 					remoteDesktopButton.setEnabled(false);
 				} else {
 
-					if (((PC) tree.getLastSelectedPathComponent())
-							.getConnectionType().equals("RD")) {
+					if (((PC) tree.getLastSelectedPathComponent()).getConnectionType().equals("RD")) {
 						vncButton.setEnabled(false);
 						remoteDesktopButton.setEnabled(true);
 					} else {
-						if (((PC) tree.getLastSelectedPathComponent())
-								.getConnectionType().equals("VNC")) {
+						if (((PC) tree.getLastSelectedPathComponent()).getConnectionType().equals("VNC")) {
 							vncButton.setEnabled(true);
 							remoteDesktopButton.setEnabled(false);
 						} else {

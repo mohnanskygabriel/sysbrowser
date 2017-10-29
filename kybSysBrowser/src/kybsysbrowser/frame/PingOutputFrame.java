@@ -124,8 +124,7 @@ public class PingOutputFrame extends Dialog {
 			Runtime r = Runtime.getRuntime();
 			Process p = r.exec(pingCmd);
 
-			BufferedReader in = new BufferedReader(new InputStreamReader(
-					p.getInputStream()));
+			BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
 			String inputLine;
 			while ((inputLine = in.readLine()) != null) {
 				lblOutput.setText(lblOutput.getText() + inputLine + "\n");

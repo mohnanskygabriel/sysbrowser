@@ -22,8 +22,7 @@ public class IOExceptionFileWriterErrorDialog extends Dialog {
 	 * @param parent
 	 * @param style
 	 */
-	public IOExceptionFileWriterErrorDialog(Shell parent, int style,
-			String filePath) {
+	public IOExceptionFileWriterErrorDialog(Shell parent, int style, String filePath) {
 		super(parent, style);
 		setText("Chyba pri zápise");
 		this.filePath = filePath;
@@ -60,8 +59,7 @@ public class IOExceptionFileWriterErrorDialog extends Dialog {
 		Label lblText = new Label(shell, SWT.LEFT);
 		lblText.setBounds(10, 10, 299, 44);
 
-		lblText.setText("Nastala chyba poèas zápisu do súboru " + "\n"
-				+ filePath);
+		lblText.setText("Nastala chyba poèas zápisu do súboru " + "\n" + filePath);
 
 		Button btnOk = new Button(shell, SWT.CENTER);
 		btnOk.addSelectionListener(new SelectionAdapter() {

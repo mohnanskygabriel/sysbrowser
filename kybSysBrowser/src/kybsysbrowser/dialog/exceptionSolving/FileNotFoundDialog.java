@@ -57,8 +57,7 @@ public class FileNotFoundDialog extends Dialog {
 		shell.setText(getText());
 		Label lblText = new Label(shell, SWT.LEFT);
 		lblText.setBounds(10, 10, 299, 44);
-		lblText.setText("Súbor" + "\n" + filePath + "\n"
-				+ "sa nenasiel, bude vytvorený nový");
+		lblText.setText("Súbor" + "\n" + filePath + "\n" + "sa nenasiel, bude vytvorený nový");
 		Button btnOk = new Button(shell, SWT.CENTER);
 		btnOk.addSelectionListener(new SelectionAdapter() {
 			@Override

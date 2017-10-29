@@ -16,8 +16,7 @@ public class PC implements TreeNode {
 	private String ip = null;
 	private String connectionType = null;
 
-	public PC(String name, String ip, String connectionType)
-			throws FileNotFoundException {
+	public PC(String name, String ip, String connectionType) throws FileNotFoundException {
 		this.id = generateID();
 		this.name = name;
 		this.ip = ip;
@@ -26,8 +25,7 @@ public class PC implements TreeNode {
 
 	private int generateID() throws FileNotFoundException {
 		int biggestID = 0;
-		List<Bookmark> bookmarks = DAOFactory.INSTANCE.getBookmarkDao()
-				.getBookmarkAll();
+		List<Bookmark> bookmarks = DAOFactory.INSTANCE.getBookmarkDao().getBookmarkAll();
 		for (Bookmark bookmark : bookmarks) {
 			if (bookmark.getId() > biggestID)
 				biggestID = bookmark.getId();
@@ -95,8 +93,7 @@ public class PC implements TreeNode {
 
 	@Override
 	public TreeNode getParent() {
-		RootNode root = (RootNode) ModelFactory.INSTANCE.getBookmarkTreeModel()
-				.getRoot();
+		RootNode root = (RootNode) ModelFactory.INSTANCE.getBookmarkTreeModel().getRoot();
 		Enumeration<Bookmark> enumeration = root.children();
 		while (enumeration.hasMoreElements()) {
 			Bookmark bm = enumeration.nextElement();

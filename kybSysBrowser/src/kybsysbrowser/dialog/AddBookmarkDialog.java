@@ -101,29 +101,29 @@ public class AddBookmarkDialog extends Dialog {
 		fd_btnSave.right = new FormAttachment(lblOdkazNaWebstranku, 0, SWT.RIGHT);
 		fd_btnSave.left = new FormAttachment(lblNazovSystemu, 0, SWT.LEFT);
 		btnSave.setLayoutData(fd_btnSave);
-		
-				btnSave.addSelectionListener(new SelectionAdapter() {
-					@Override
-					public void widgetSelected(SelectionEvent e) {
-						checkInput();
-						try {
-							if (!editMode)
-								DAOFactory.INSTANCE.getBookmarkDao()
-										.insertBookmark(new Bookmark(inputUserBookmarkName.getText(), inputUserURL.getText()));
-							else {
-								Bookmark bm = (Bookmark) WindowFactory.INSTANCE.getWindow_Browser().getTree()
-										.getLastSelectedPathComponent();
-								bm.setName(inputUserBookmarkName.getText());
-								bm.setUrl(inputUserURL.getText());
-								DAOFactory.INSTANCE.getBookmarkDao().editBookmark(bm);
-							}
-						} catch (FileNotFoundException fnfEx) {
-							fnfEx.printStackTrace();
-						} finally {
-							shell.close();
-						}
+
+		btnSave.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				checkInput();
+				try {
+					if (!editMode)
+						DAOFactory.INSTANCE.getBookmarkDao()
+								.insertBookmark(new Bookmark(inputUserBookmarkName.getText(), inputUserURL.getText()));
+					else {
+						Bookmark bm = (Bookmark) WindowFactory.INSTANCE.getWindow_Browser().getTree()
+								.getLastSelectedPathComponent();
+						bm.setName(inputUserBookmarkName.getText());
+						bm.setUrl(inputUserURL.getText());
+						DAOFactory.INSTANCE.getBookmarkDao().editBookmark(bm);
 					}
-				});
+				} catch (FileNotFoundException fnfEx) {
+					fnfEx.printStackTrace();
+				} finally {
+					shell.close();
+				}
+			}
+		});
 		btnCancel = new Button(shell, SWT.NONE);
 		fd_btnSave.bottom = new FormAttachment(btnCancel, 0, SWT.BOTTOM);
 		FormData fd_btnCancel = new FormData();
