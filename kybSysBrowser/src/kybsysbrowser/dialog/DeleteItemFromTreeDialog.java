@@ -1,14 +1,5 @@
 package kybsysbrowser.dialog;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-
-import kybsysbrowser.dialog.exceptionSolving.FileNotFoundDialog;
-import kybsysbrowser.entity.Bookmark;
-import kybsysbrowser.entity.PC;
-import kybsysbrowser.factory.DAOFactory;
-import kybsysbrowser.factory.WindowFactory;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -21,6 +12,11 @@ import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+
+import kybsysbrowser.entity.Bookmark;
+import kybsysbrowser.entity.PC;
+import kybsysbrowser.factory.DAOFactory;
+import kybsysbrowser.factory.WindowFactory;
 
 public class DeleteItemFromTreeDialog extends Dialog {
 
@@ -79,16 +75,13 @@ public class DeleteItemFromTreeDialog extends Dialog {
 		noButton.setLayoutData(fd_noButton);
 		noButton.setText("Nie");
 
-		Object selectionInTree = WindowFactory.INSTANCE.getWindow_Browser()
-				.getTree().getLastSelectedPathComponent();
+		Object selectionInTree = WindowFactory.INSTANCE.getWindow_Browser().getTree().getLastSelectedPathComponent();
 
 		if (selectionInTree.getClass() == Bookmark.class)
-			lblMessage.setText("UrËite chces vymazaù poloûku "
-					+ selectionInTree.toString()
+			lblMessage.setText("UrËite chces vymazaù poloûku " + selectionInTree.toString()
 					+ " ? Vymaû˙ sa aj pridelenÈ poËÌtaËe v zozname!");
 		else
-			lblMessage.setText("UrËite chces vymazaù poloûku "
-					+ selectionInTree.toString() + " ?");
+			lblMessage.setText("UrËite chces vymazaù poloûku " + selectionInTree.toString() + " ?");
 
 		yesButton.addSelectionListener(new SelectionAdapter() {
 
@@ -96,20 +89,10 @@ public class DeleteItemFromTreeDialog extends Dialog {
 			public void widgetSelected(SelectionEvent e) {
 				try {
 					if (selectionInTree.getClass() == Bookmark.class) {
-						DAOFactory.INSTANCE.getBookmarkDao().deleteBookmark(
-								(Bookmark) selectionInTree);
+						DAOFactory.INSTANCE.getBookmarkDao().deleteBookmark((Bookmark) selectionInTree);
 					} else {
-						DAOFactory.INSTANCE.getPCDAO().deletePC(
-								(PC) selectionInTree);
+						DAOFactory.INSTANCE.getPCDAO().deletePC((PC) selectionInTree);
 					}
-				} catch (FileNotFoundException fnfEx) {
-					FileNotFoundDialog popupFnF = null;
-					popupFnF = new FileNotFoundDialog(WindowFactory.INSTANCE
-							.getWindow_Browser().getShell(), SWT.DIALOG_TRIM,
-							new File(DAOFactory.INSTANCE.getSettingDAO()
-									.getSetting("File of bookmarks"))
-									.getAbsolutePath());
-					popupFnF.open();
 				} finally {
 					shell.close();
 				}

@@ -1,9 +1,6 @@
 package kybsysbrowser.entity;
 
-import java.io.FileNotFoundException;
 import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Vector;
 
 import javax.swing.tree.TreeNode;
@@ -14,25 +11,15 @@ public class RootNode implements TreeNode {
 
 	@Override
 	public TreeNode getChildAt(int childIndex) {
-		try {
-			return DAOFactory.INSTANCE.getBookmarkDao().getBookmarkAll()
-					.get(childIndex);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
+		return DAOFactory.INSTANCE.getBookmarkDao().getBookmarkAll().get(childIndex);
+
 	}
 
 	@Override
 	public int getChildCount() {
-		try {
-			return DAOFactory.INSTANCE.getBookmarkDao().getBookmarkAll().size();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return -1;
+
+		return DAOFactory.INSTANCE.getBookmarkDao().getBookmarkAll().size();
+
 	}
 
 	@Override
@@ -42,14 +29,7 @@ public class RootNode implements TreeNode {
 
 	@Override
 	public int getIndex(TreeNode node) {
-		List<Bookmark> list = new LinkedList<Bookmark>();
-		try {
-			list = DAOFactory.INSTANCE.getBookmarkDao().getBookmarkAll();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return list.indexOf(node);
+		return DAOFactory.INSTANCE.getBookmarkDao().getBookmarkAll().indexOf(node);
 	}
 
 	@Override
@@ -64,14 +44,7 @@ public class RootNode implements TreeNode {
 
 	@Override
 	public Enumeration<Bookmark> children() {
-		List<Bookmark> list = new LinkedList<Bookmark>();
-		try {
-			list = DAOFactory.INSTANCE.getBookmarkDao().getBookmarkAll();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return new Vector<Bookmark>(list).elements();
+		return new Vector<Bookmark>(DAOFactory.INSTANCE.getBookmarkDao().getBookmarkAll()).elements();
 	}
 
 	@Override

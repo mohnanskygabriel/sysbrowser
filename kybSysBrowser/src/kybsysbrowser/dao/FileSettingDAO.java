@@ -16,19 +16,16 @@ import com.google.gson.stream.JsonWriter;
 
 public class FileSettingDAO implements SettingDAO {
 
-	private File settingsFile = new File("src/settings.txt");
+	private static final File settingsFile = new File("src/settings.txt");
 
 	@Override
 	public void insertSetting(String name, String setting) {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		try {
-			JsonWriter writer = gson.newJsonWriter(new FileWriter(settingsFile,
-					true));
+		try (JsonWriter writer = gson.newJsonWriter(new FileWriter(getSettingsFile(), true))) {
 			writer.beginObject();
 			writer.name(name);
 			writer.jsonValue("\"" + setting + "\"");
 			writer.endObject();
-			writer.close();
 		} catch (IOException ioEx) {
 			ioEx.printStackTrace();
 		}
@@ -36,9 +33,7 @@ public class FileSettingDAO implements SettingDAO {
 
 	@Override
 	public String getSetting(String name) {
-		JsonReader jReader = null;
-		try {
-			jReader = new JsonReader(new FileReader(settingsFile));
+		try (JsonReader jReader = new JsonReader(new FileReader(getSettingsFile()))) {
 			jReader.setLenient(true);
 			while (jReader.hasNext()) {
 				if (jReader.peek() == JsonToken.END_DOCUMENT) {
@@ -46,14 +41,13 @@ public class FileSettingDAO implements SettingDAO {
 					 * the Reader is in the end of file and it doesn't found the
 					 * setting
 					 */
-					jReader.close();
 					return null;
 				}
 
 				jReader.beginObject();
 				if (jReader.nextName().equals(name)) {
 					String setting = jReader.nextString();
-					jReader.close();
+
 					return setting;
 				} else {
 					jReader.nextString();
@@ -65,35 +59,26 @@ public class FileSettingDAO implements SettingDAO {
 		} catch (IOException ioEx) {
 			ioEx.printStackTrace();
 		}
-		if (jReader != null)
-			try {
-				jReader.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
 		return null;
 	}
 
 	@Override
 	public void editSetting(String name, String newSetting) {
 		Map<String, String> settings = new HashMap<String, String>();
-		JsonReader jReader = null;
-		try {
-			jReader = new JsonReader(new FileReader(settingsFile));
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		try (JsonReader jReader = new JsonReader(new FileReader(getSettingsFile()));
+				JsonWriter jWriter = gson.newJsonWriter(new FileWriter(getSettingsFile(), false))) {
+
 			jReader.setLenient(true);
 			while (jReader.hasNext()) {
 				if (jReader.peek() == JsonToken.END_DOCUMENT) {
-					jReader.close();
 					break;
 				}
 				jReader.beginObject();
 				settings.put(jReader.nextName(), jReader.nextString());
 				jReader.endObject();
 			}
-			Gson gson = new GsonBuilder().setPrettyPrinting().create();
-			JsonWriter jWriter = gson.newJsonWriter(new FileWriter(
-					settingsFile, false));
+
 			jWriter.setLenient(true);
 			for (String settingName : settings.keySet()) {
 				jWriter.beginObject();
@@ -105,7 +90,6 @@ public class FileSettingDAO implements SettingDAO {
 				}
 				jWriter.endObject();
 			}
-			jWriter.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException ioEx) {
@@ -114,7 +98,7 @@ public class FileSettingDAO implements SettingDAO {
 
 	}
 
-	public File getSettingsFile() {
+	private File getSettingsFile() {
 		return settingsFile;
 	}
 

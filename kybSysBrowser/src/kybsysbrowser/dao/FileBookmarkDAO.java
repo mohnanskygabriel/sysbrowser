@@ -23,15 +23,14 @@ import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 
 public class FileBookmarkDAO implements BookmarkDAO {
+	private final static File bookmarksFile = new File(
+			DAOFactory.INSTANCE.getSettingDAO().getSetting("File of bookmarks"));
 
 	@Override
-	public void insertBookmark(Bookmark bookmark) throws FileNotFoundException {
+	public void insertBookmark(Bookmark bookmark) {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		try {
-			FileWriter fileW = new FileWriter(getFileOfBookmarks(), true);
-			JsonWriter writer = gson.newJsonWriter(fileW);
+		try (JsonWriter writer = gson.newJsonWriter(new FileWriter(getBookmarksfile(), true))) {
 			writer.jsonValue(gson.toJson(bookmark));
-			writer.close();
 		} catch (IOException ioEx) {
 			popupIOException(ioEx);
 		}
@@ -39,50 +38,30 @@ public class FileBookmarkDAO implements BookmarkDAO {
 	}
 
 	@Override
-	public void deleteBookmark(Bookmark bookmark) throws FileNotFoundException {
-		List<Bookmark> bookmarkList = new LinkedList<Bookmark>();
-		FileReader reader = new FileReader(getFileOfBookmarks());
-		Gson gson = new GsonBuilder().create();
-		JsonReader jReader = new JsonReader(reader);
-		jReader.setLenient(true);
-		try {
-			while (jReader.hasNext()) {
-				if (jReader.peek() == JsonToken.END_DOCUMENT) {
-					break;
-				} else {
-					bookmarkList.add(gson.fromJson(jReader, Bookmark.class));
-				}
+	public void deleteBookmark(Bookmark bookmark) {
+		List<Bookmark> bookmarkList = getBookmarkAll();
+		deleteFileOfBookmarksAndCreateNew();
+		for (Bookmark bookmarkOld : bookmarkList) {
+			if (bookmarkOld.getId() != bookmark.getId()) {
+				insertBookmark(bookmarkOld);
 			}
-			reader.close();
-			jReader.close();
-			deleteFileOfBookmarksAndCreateNew();
-			for (Bookmark bookmarkOld : bookmarkList) {
-				if (bookmarkOld.getId() != bookmark.getId()) {
-					insertBookmark(bookmarkOld);
-				}
-			}
-		} catch (IOException ioEx) {
-			popupIOException(ioEx);
 		}
 	}
 
 	@Override
-	public Bookmark getBookmark(Bookmark bookmark) throws FileNotFoundException {
-		if (getFileOfBookmarks().length() < 1) {
+	public Bookmark getBookmark(Bookmark bookmark) {
+		if (getBookmarksfile().length() < 1) {
 			return null;
 		}
-		FileReader reader = new FileReader(getFileOfBookmarks());
 		Gson gson = new GsonBuilder().create();
-		JsonReader jReader = new JsonReader(reader);
-		jReader.setLenient(true);
-		try {
+		try (JsonReader jReader = new JsonReader(new FileReader(getBookmarksfile()))) {
+			jReader.setLenient(true);
 			while (jReader.hasNext()) {
 				// if the Reader is in the end of file it doesn't found the
 				// bookmark
 				if (jReader.peek() == JsonToken.END_DOCUMENT)
 					return null;
-				Bookmark bookmarkFromReader = gson.fromJson(jReader,
-						Bookmark.class);
+				Bookmark bookmarkFromReader = gson.fromJson(jReader, Bookmark.class);
 				if (bookmarkFromReader == bookmark)
 					return bookmarkFromReader;
 			}
@@ -94,22 +73,21 @@ public class FileBookmarkDAO implements BookmarkDAO {
 	}
 
 	@Override
-	public List<Bookmark> getBookmarkAll() throws FileNotFoundException {
+	public List<Bookmark> getBookmarkAll() {
 		List<Bookmark> bookmarkList = new LinkedList<Bookmark>();
-		try {
-			if (getFileOfBookmarks().length() < 1) {
+		try (JsonReader jReader = new JsonReader(new FileReader(getBookmarksfile()))) {
+			if (getBookmarksfile().length() < 1) {
 				return bookmarkList;
 			}
-			FileReader reader = new FileReader(getFileOfBookmarks());
-			Gson gson = new GsonBuilder().create();
-			JsonReader jReader = new JsonReader(reader);
 			jReader.setLenient(true);
+			Gson gson = new GsonBuilder().create();
 			while (jReader.hasNext()) {
 				if (jReader.peek() == JsonToken.END_DOCUMENT)
 					return bookmarkList;
 				bookmarkList.add(gson.fromJson(jReader, Bookmark.class));
 			}
-
+		} catch (FileNotFoundException ex) {
+			ex.printStackTrace();
 		} catch (IOException ioEx) {
 			popupIOException(ioEx);
 		}
@@ -117,7 +95,7 @@ public class FileBookmarkDAO implements BookmarkDAO {
 	}
 
 	@Override
-	public void editBookmark(Bookmark newBookmark) throws FileNotFoundException {
+	public void editBookmark(Bookmark newBookmark) {
 		List<Bookmark> bookmarkList = getBookmarkAll();
 		deleteFileOfBookmarksAndCreateNew();
 		for (Bookmark bookmark : bookmarkList) {
@@ -129,24 +107,21 @@ public class FileBookmarkDAO implements BookmarkDAO {
 	}
 
 	@Override
-	public Bookmark getBookmarkById(int bookmarkId)
-			throws FileNotFoundException {
-		try {
+	public Bookmark getBookmarkById(int bookmarkId) {
+		try (JsonReader jReader = new JsonReader(new FileReader(getBookmarksfile()))) {
 			Gson gson = new GsonBuilder().create();
-			JsonReader jReader = new JsonReader(new FileReader(
-					getFileOfBookmarks()));
 			jReader.setLenient(true);
 			while (jReader.hasNext()) {
 				if (jReader.peek() == JsonToken.END_DOCUMENT) {
-					jReader.close();
-					break;
+					return null;
 				}
 				Bookmark bookmark = gson.fromJson(jReader, Bookmark.class);
 				if (bookmark.getId() == bookmarkId) {
-					jReader.close();
 					return bookmark;
 				}
 			}
+		} catch (FileNotFoundException ex) {
+			ex.printStackTrace();
 		} catch (IOException ioEx) {
 			ioEx.printStackTrace();
 		}
@@ -157,13 +132,10 @@ public class FileBookmarkDAO implements BookmarkDAO {
 	public Bookmark getBookmarkContainingPC(PC pc) {
 		Bookmark bookmark = null;
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		JsonReader jReader = null;
-		try {
-			jReader = new JsonReader(new FileReader(getFileOfBookmarks()));
+		try (JsonReader jReader = new JsonReader(new FileReader(getBookmarksfile()))) {
 			jReader.setLenient(true);
 			while (jReader.hasNext()) {
 				if (jReader.peek() == JsonToken.END_DOCUMENT) {
-					jReader.close();
 					return null;
 				}
 				bookmark = gson.fromJson(jReader, Bookmark.class);
@@ -183,32 +155,30 @@ public class FileBookmarkDAO implements BookmarkDAO {
 	private void popupIOException(IOException ioEx) {
 		ioEx.printStackTrace();
 		IOExceptionFileWriterErrorDialog popupIOEx = null;
-		popupIOEx = new IOExceptionFileWriterErrorDialog(WindowFactory.INSTANCE
-				.getWindow_Browser().getShell(), SWT.DIALOG_TRIM,
-				getFileOfBookmarks().getAbsolutePath());
+		popupIOEx = new IOExceptionFileWriterErrorDialog(WindowFactory.INSTANCE.getWindow_Browser().getShell(),
+				SWT.DIALOG_TRIM, getBookmarksfile().getAbsolutePath());
 		popupIOEx.open();
 	}
 
-	public File getFileOfBookmarks() {
-		return new File(DAOFactory.INSTANCE.getSettingDAO().getSetting(
-				"File of bookmarks"));
-	}
-	
 	private void deleteFileOfBookmarksAndCreateNew() {
 		boolean deleted = false;
 		for (int i = 0; i < 20; i++) {
-			deleted = getFileOfBookmarks().delete();
+			deleted = getBookmarksfile().delete();
 			if (deleted)
 				break;
 			System.gc();
 			Thread.yield();
 		}
 		try {
-			getFileOfBookmarks().createNewFile();
+			getBookmarksfile().createNewFile();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
+	}
+
+	private static File getBookmarksfile() {
+		return bookmarksFile;
 	}
 
 }

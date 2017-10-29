@@ -232,11 +232,7 @@ public class AddPCDialog extends Dialog {
 					currentPC.setConnectionType(connectionType);
 					currentPC.setIp(textIPAdress.getText());
 					currentPC.setName(textPCName.getText());
-					try {
-						DAOFactory.INSTANCE.getPCDAO().editPC(currentPC);
-					} catch (FileNotFoundException e1) {
-						e1.printStackTrace();
-					}
+					DAOFactory.INSTANCE.getPCDAO().editPC(currentPC);
 					shell.close();
 				}
 			});
@@ -261,12 +257,8 @@ public class AddPCDialog extends Dialog {
 					} catch (FileNotFoundException e2) {
 						e2.printStackTrace();
 					}
-					try {
-						DAOFactory.INSTANCE.getPCDAO().insertPC(newPC, ((Bookmark) WindowFactory.INSTANCE
-								.getWindow_Browser().getTree().getLastSelectedPathComponent()).getId());
-					} catch (FileNotFoundException e1) {
-						e1.printStackTrace();
-					}
+					DAOFactory.INSTANCE.getPCDAO().insertPC(newPC, ((Bookmark) WindowFactory.INSTANCE
+							.getWindow_Browser().getTree().getLastSelectedPathComponent()).getId());
 					ModelFactory.INSTANCE.getBookmarkTreeModel().nodeStructureChanged((TreeNode) WindowFactory.INSTANCE
 							.getWindow_Browser().getTree().getLastSelectedPathComponent());
 					shell.close();
