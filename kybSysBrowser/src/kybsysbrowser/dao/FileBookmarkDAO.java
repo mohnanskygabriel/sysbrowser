@@ -1,18 +1,14 @@
 package kybsysbrowser.dao;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.LinkedList;
 import java.util.List;
-
-import kybsysbrowser.dialog.exceptionSolving.IOExceptionFileWriterErrorDialog;
-import kybsysbrowser.entity.Bookmark;
-import kybsysbrowser.entity.PC;
-import kybsysbrowser.factory.DAOFactory;
-import kybsysbrowser.factory.WindowFactory;
 
 import org.eclipse.swt.SWT;
 
@@ -22,6 +18,12 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 
+import kybsysbrowser.dialog.exceptionSolving.IOExceptionFileWriterErrorDialog;
+import kybsysbrowser.entity.Bookmark;
+import kybsysbrowser.entity.PC;
+import kybsysbrowser.factory.DAOFactory;
+import kybsysbrowser.factory.WindowFactory;
+
 public class FileBookmarkDAO implements BookmarkDAO {
 	private final static File bookmarksFile = new File(
 			DAOFactory.INSTANCE.getSettingDAO().getSetting("File of bookmarks"));
@@ -29,7 +31,8 @@ public class FileBookmarkDAO implements BookmarkDAO {
 	@Override
 	public void insertBookmark(Bookmark bookmark) {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		try (JsonWriter writer = gson.newJsonWriter(new FileWriter(getBookmarksfile(), true))) {
+		try (JsonWriter writer = gson
+				.newJsonWriter(new OutputStreamWriter(new FileOutputStream(getBookmarksfile(), true), "UTF-8"))) {
 			writer.jsonValue(gson.toJson(bookmark));
 		} catch (IOException ioEx) {
 			popupIOException(ioEx);
@@ -54,7 +57,8 @@ public class FileBookmarkDAO implements BookmarkDAO {
 			return null;
 		}
 		Gson gson = new GsonBuilder().create();
-		try (JsonReader jReader = new JsonReader(new FileReader(getBookmarksfile()))) {
+		try (JsonReader jReader = new JsonReader(
+				new InputStreamReader(new FileInputStream(getBookmarksfile()), "UTF-8"))) {
 			jReader.setLenient(true);
 			while (jReader.hasNext()) {
 				// if the Reader is in the end of file it doesn't found the
@@ -75,7 +79,8 @@ public class FileBookmarkDAO implements BookmarkDAO {
 	@Override
 	public List<Bookmark> getBookmarkAll() {
 		List<Bookmark> bookmarkList = new LinkedList<Bookmark>();
-		try (JsonReader jReader = new JsonReader(new FileReader(getBookmarksfile()))) {
+		try (JsonReader jReader = new JsonReader(
+				new InputStreamReader(new FileInputStream(getBookmarksfile()), "UTF-8"))) {
 			if (getBookmarksfile().length() < 1) {
 				return bookmarkList;
 			}
@@ -108,7 +113,8 @@ public class FileBookmarkDAO implements BookmarkDAO {
 
 	@Override
 	public Bookmark getBookmarkById(int bookmarkId) {
-		try (JsonReader jReader = new JsonReader(new FileReader(getBookmarksfile()))) {
+		try (JsonReader jReader = new JsonReader(
+				new InputStreamReader(new FileInputStream(getBookmarksfile()), "UTF-8"))) {
 			Gson gson = new GsonBuilder().create();
 			jReader.setLenient(true);
 			while (jReader.hasNext()) {
@@ -132,7 +138,8 @@ public class FileBookmarkDAO implements BookmarkDAO {
 	public Bookmark getBookmarkContainingPC(PC pc) {
 		Bookmark bookmark = null;
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		try (JsonReader jReader = new JsonReader(new FileReader(getBookmarksfile()))) {
+		try (JsonReader jReader = new JsonReader(
+				new InputStreamReader(new FileInputStream(getBookmarksfile()), "UTF-8"))) {
 			jReader.setLenient(true);
 			while (jReader.hasNext()) {
 				if (jReader.peek() == JsonToken.END_DOCUMENT) {
@@ -162,15 +169,18 @@ public class FileBookmarkDAO implements BookmarkDAO {
 
 	private void deleteFileOfBookmarksAndCreateNew() {
 		boolean deleted = false;
-		for (int i = 0; i < 20; i++) {
-			deleted = getBookmarksfile().delete();
-			if (deleted)
-				break;
-			System.gc();
-			Thread.yield();
-		}
 		try {
-			getBookmarksfile().createNewFile();
+			for (int i = 0; i < 20; i++) {
+				deleted = getBookmarksfile().delete();
+				if (deleted)
+					break;
+				System.gc();
+				Thread.yield();
+			}
+
+			if (!getBookmarksfile().createNewFile()) {
+				throw new IOException();
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -178,6 +188,7 @@ public class FileBookmarkDAO implements BookmarkDAO {
 	}
 
 	private static File getBookmarksfile() {
+
 		return bookmarksFile;
 	}
 

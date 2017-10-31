@@ -1,12 +1,16 @@
 package kybsysbrowser.dao;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -21,11 +25,12 @@ public class FileSettingDAO implements SettingDAO {
 	@Override
 	public void insertSetting(String name, String setting) {
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		try (JsonWriter writer = gson.newJsonWriter(new FileWriter(getSettingsFile(), true))) {
-			writer.beginObject();
-			writer.name(name);
-			writer.jsonValue("\"" + setting + "\"");
-			writer.endObject();
+		try (JsonWriter jWriter = gson
+				.newJsonWriter(new OutputStreamWriter(new FileOutputStream(getSettingsFile(), true), "UTF-8"))) {
+			jWriter.beginObject();
+			jWriter.name(name);
+			jWriter.jsonValue("\"" + setting + "\"");
+			jWriter.endObject();
 		} catch (IOException ioEx) {
 			ioEx.printStackTrace();
 		}
@@ -33,7 +38,8 @@ public class FileSettingDAO implements SettingDAO {
 
 	@Override
 	public String getSetting(String name) {
-		try (JsonReader jReader = new JsonReader(new FileReader(getSettingsFile()))) {
+		try (JsonReader jReader = new JsonReader(
+				new InputStreamReader(new FileInputStream(getSettingsFile()), "UTF-8"))) {
 			jReader.setLenient(true);
 			while (jReader.hasNext()) {
 				if (jReader.peek() == JsonToken.END_DOCUMENT) {
@@ -66,8 +72,9 @@ public class FileSettingDAO implements SettingDAO {
 	public void editSetting(String name, String newSetting) {
 		Map<String, String> settings = new HashMap<String, String>();
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		try (JsonReader jReader = new JsonReader(new FileReader(getSettingsFile()));
-				JsonWriter jWriter = gson.newJsonWriter(new FileWriter(getSettingsFile(), false))) {
+
+		try (JsonReader jReader = new JsonReader(
+				new InputStreamReader(new FileInputStream(getSettingsFile()), "UTF-8"));) {
 
 			jReader.setLenient(true);
 			while (jReader.hasNext()) {
@@ -78,22 +85,50 @@ public class FileSettingDAO implements SettingDAO {
 				settings.put(jReader.nextName(), jReader.nextString());
 				jReader.endObject();
 			}
-
-			jWriter.setLenient(true);
-			for (String settingName : settings.keySet()) {
-				jWriter.beginObject();
-				jWriter.name(settingName);
-				if (settingName.equals(name)) {
-					jWriter.jsonValue("\"" + newSetting + "\"");
-				} else {
-					jWriter.jsonValue("\"" + settings.get(settingName) + "\"");
+			jReader.close();
+			deleteSettingsFileAndCreateNew();
+			try (JsonWriter jWriter = gson
+					.newJsonWriter(new OutputStreamWriter(new FileOutputStream(getSettingsFile(), true), "UTF-8"))) {
+				jWriter.setLenient(true);
+				for (final Iterator<Entry<String, String>> iter = settings.entrySet().iterator(); iter.hasNext();) {
+					jWriter.beginObject();
+					Map.Entry<String, String> entry = iter.next();
+					final String settingName = entry.getKey();
+					final String value = entry.getValue();
+					jWriter.name(settingName);
+					if (settingName.equals(name)) {
+						jWriter.jsonValue("\"" + newSetting + "\"");
+					} else {
+						jWriter.jsonValue("\"" + value + "\"");
+					}
+					jWriter.endObject();
 				}
-				jWriter.endObject();
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException ioEx) {
 			ioEx.printStackTrace();
+		}
+
+	}
+
+	private void deleteSettingsFileAndCreateNew() {
+		boolean deleted = false;
+		try {
+			for (int i = 0; i < 20; i++) {
+				deleted = getSettingsFile().delete();
+				if (deleted)
+					break;
+				System.gc();
+				Thread.yield();
+			}
+			if (!getSettingsFile().createNewFile()) {
+				throw new IOException();
+			}
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 
 	}

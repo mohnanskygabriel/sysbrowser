@@ -23,7 +23,7 @@ public class InputMissingDialog extends Dialog {
 
 		super(parent, style);
 		setText("Ch˝baj˙ce vstupy");
-		this.missingInputs = missingInputs;
+		setMissingInputs(missingInputs);
 
 	}
 
@@ -58,7 +58,7 @@ public class InputMissingDialog extends Dialog {
 		Label lblText = new Label(shell, SWT.LEFT);
 		lblText.setBounds(10, 10, 299, 44);
 		StringBuilder sb = new StringBuilder();
-		for (String input : missingInputs) {
+		for (String input : getMissingInputs()) {
 			sb.append(input + "\n");
 		}
 		lblText.setText("MusÌö zadaù " + "\n" + sb.toString());
@@ -66,4 +66,13 @@ public class InputMissingDialog extends Dialog {
 		shell.setSize(shell.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
 	}
+
+	private String[] getMissingInputs() {
+		return missingInputs;
+	}
+
+	private void setMissingInputs(String[] missingInputs) {
+		this.missingInputs = missingInputs;
+	}
+
 }
